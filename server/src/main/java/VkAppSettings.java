@@ -2,14 +2,15 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
 
-public class ClientSettings {
+public class VkAppSettings {
     String app_id;
     String access_token;
     String client_secret;
-    String group_id;
+    Integer user_id;
+    Integer group_id;
     String redirect_uri;
 
-    public ClientSettings() {
+    public VkAppSettings() {
         Properties prop = new Properties();
         try
         {
@@ -17,8 +18,9 @@ public class ClientSettings {
             app_id = prop.getProperty("app_id");
             access_token = prop.getProperty("access_token");
             client_secret = prop.getProperty("client_secret");
-            group_id = prop.getProperty("group_id");
+            group_id = Integer.valueOf(prop.getProperty("group_id"));
             redirect_uri = prop.getProperty("redirect_uri");
+            user_id = Integer.valueOf(prop.getProperty("user_id"));
         } catch (IOException e) {
             e.printStackTrace();
             System.out.println("Ошибка при загрузке файла конфигурации");

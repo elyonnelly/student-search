@@ -5,13 +5,13 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-
-<StackPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller" stylesheets="styles.css">
+<StackPane stylesheets="styles.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller">
    <children>
       <VBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="188.0" prefWidth="202.0">
          <children>
             <Label text="Здравствуйте!" />
-            <Button fx:id="authorization" mnemonicParsing="false" onAction="#onActionAuthorization" text="Авторизуйтесь" />
+            <Button fx:id="authorization" mnemonicParsing="false" onAction="#onActionAuthorization" text="Авторизуйтесь ВКонтакте" />
+            <Label prefHeight="36.0" prefWidth="202.0" text="Вы будете перенаправлены на страницу в браузере" textAlignment="CENTER" wrapText="true" />
          </children>
       </VBox>
    </children>

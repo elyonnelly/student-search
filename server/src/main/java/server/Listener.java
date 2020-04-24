@@ -1,3 +1,5 @@
+package server;
+
 import org.apache.http.NameValuePair;
 
 import java.util.List;

@@ -1,3 +1,5 @@
+package server;
+
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import org.apache.http.client.utils.URLEncodedUtils;
@@ -15,7 +17,6 @@ public class HttpSimpleHandler implements HttpHandler {
     @Override
     public void handle(HttpExchange exchange) {
         var parameters = URLEncodedUtils.parse(exchange.getRequestURI(), String.valueOf(Charset.defaultCharset()));
-        System.out.println(parameters.size());
 
         listener.actionPerformed(parameters);
     }

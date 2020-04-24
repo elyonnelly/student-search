@@ -1,30 +1,37 @@
+import api.ErrorMessage;
+import api.StudentSearchApp;
 import com.vk.api.sdk.exceptions.ApiException;
 import com.vk.api.sdk.exceptions.ClientException;
-import org.apache.http.HttpException;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-
-import java.io.IOException;
-import java.net.URISyntaxException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class VKClientTest {
 
-    @Test
-    void testStartUp() throws IOException, URISyntaxException, HttpException, ApiException, ClientException, InterruptedException {
-        StudentSearchClient client = new StudentSearchClient();
-        client.startApp();
-        client.user.doAuthorization();
-        assertNotNull(client.user.userActor);
+    private static StudentSearchApp app;
+
+    @BeforeAll
+    static void testStartUp() {
+        app = new StudentSearchApp();
+        app.startApp();
+        app.userAuthorization();
     }
 
     @Test
-    void testGetGroups() throws InterruptedException, HttpException, IOException, ApiException, URISyntaxException, ClientException {
-        StudentSearchClient client = new StudentSearchClient();
-        client.startApp();
-        client.user.setUserActor();
-        client.user.overviewGroups();
-        assertEquals(client.appSettings.group_id, client.user.groups.get(0));
+    void testUserAuthorization() {
+        var response = app.userAuthorization();
+        assertEquals(ErrorMessage.SUCCESS, response);
     }
+
+    @Test
+    void testGetGroups() {
+        var groupIds = app.getGroupIds();
+        System.out.println(groupIds);
+        Integer groupId = groupIds.get(0);
+        var response = app.groupAuthorization(groupId);
+        assertEquals(ErrorMessage.SUCCESS, response);
+    }
+
 }

@@ -3,6 +3,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressBar?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.layout.BorderPane?>
@@ -12,31 +13,49 @@
 
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <bottom>
-      <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-         <children>
-            <Button mnemonicParsing="false" prefHeight="38.0" prefWidth="163.0" text="Сделать рассылку" />
-            <Button mnemonicParsing="false" prefHeight="37.0" prefWidth="156.0" text="Позвать в сообщество">
-               <HBox.margin>
-                  <Insets left="30.0" />
-               </HBox.margin>
-            </Button>
-         </children>
+      <VBox BorderPane.alignment="CENTER">
          <BorderPane.margin>
             <Insets left="20.0" />
          </BorderPane.margin>
+         <children>
+            <HBox alignment="CENTER" prefHeight="52.0" prefWidth="580.0">
+               <children>
+                  <Button mnemonicParsing="false" prefHeight="29.0" prefWidth="138.0" text="Сделать рассылку" />
+                  <Button mnemonicParsing="false" prefHeight="33.0" prefWidth="149.0" text="Позвать в сообщество">
+                     <HBox.margin>
+                        <Insets left="30.0" />
+                     </HBox.margin>
+                  </Button>
+               </children>
+               <padding>
+                  <Insets right="20.0" />
+               </padding>
+               <VBox.margin>
+                  <Insets />
+               </VBox.margin>
+            </HBox>
+            <ProgressBar prefHeight="18.0" prefWidth="563.0" progress="0.0" />
+         </children>
          <padding>
-            <Insets right="20.0" />
+            <Insets bottom="20.0" />
          </padding>
-      </HBox>
+      </VBox>
    </bottom>
    <top>
       <VBox prefHeight="102.0" prefWidth="560.0" BorderPane.alignment="CENTER">
          <children>
-            <Label text="Группа">
-               <font>
-                  <Font size="16.0" />
-               </font>
-            </Label>
+            <BorderPane prefHeight="30.0" prefWidth="560.0">
+               <left>
+                  <Label text="Группа" BorderPane.alignment="CENTER">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </Label>
+               </left>
+               <right>
+                  <Button alignment="CENTER" mnemonicParsing="false" text="&lt;-" textAlignment="RIGHT" BorderPane.alignment="CENTER" />
+               </right>
+            </BorderPane>
             <Label text="Название группы">
                <font>
                   <Font size="22.0" />
@@ -77,9 +96,6 @@
                <font>
                   <Font size="18.0" />
                </font>
-               <VBox.margin>
-                  <Insets top="10.0" />
-               </VBox.margin>
             </Label>
             <ScrollPane>
                <content>

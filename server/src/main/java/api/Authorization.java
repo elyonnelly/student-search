@@ -13,6 +13,7 @@ import java.awt.*;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 class Authorization {
@@ -25,13 +26,16 @@ class Authorization {
         return new UserActor(authResponse.getUserId(), authResponse.getAccessToken());
     }
 
-    static GroupActor createGroupActor(StudentSearchApp app, Integer groupId) throws URISyntaxException, InterruptedException, IOException, HttpException, ClientException, ApiException {
+    static Map<Integer, String> getAuthGroupCodes(StudentSearchApp app) throws URISyntaxException, InterruptedException, IOException, HttpException, ClientException, ApiException {
         GroupAuthResponse authResponse = app.vk.oauth()
                 .groupAuthorizationCodeFlow(app.appSettings.app_id, app.appSettings.client_secret,
-                                            app.appSettings.redirect_uri, getAuthCode(app, getGroupAuthUri(app)))
+                        app.appSettings.redirect_uri, getAuthCode(app, getGroupAuthUri(app)))
                 .execute();
+        return authResponse.getAccessTokens();
+    }
 
-       return new GroupActor(groupId, authResponse.getAccessTokens().get(groupId));
+    static GroupActor createGroupActor(Integer groupId, Map<Integer, String> authCodes) {
+       return new GroupActor(groupId, authCodes.get(groupId));
     }
 
     private static String getAuthCode(StudentSearchApp app, URI AuthorizationUri) throws IOException, InterruptedException, HttpException {
@@ -62,7 +66,7 @@ class Authorization {
         uri.addParameter("client_id", app.appSettings.app_id.toString());
         uri.addParameter("display", "page");
         uri.addParameter("redirect_uri", app.appSettings.redirect_uri);
-        uri.addParameter("scope", "groups");
+        uri.addParameter("scope", "groups,messages");
         uri.addParameter("response_type", "code");
         uri.addParameter("v", "5.45");
         return uri.build();
@@ -73,7 +77,7 @@ class Authorization {
         URIBuilder uri = new URIBuilder(authorizationUri);
         uri.addParameter("client_id", app.appSettings.app_id.toString());
         uri.addParameter("redirect_uri", app.appSettings.redirect_uri);
-        uri.addParameter("group_ids", app.groupIds.stream()
+        uri.addParameter("group_ids", app.getGroupIds().stream()
                                             .map(String::valueOf)
                                             .collect(Collectors.joining(",", "", "")));
         uri.addParameter("display", "page");

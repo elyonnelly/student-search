@@ -14,11 +14,18 @@
    <top>
       <VBox prefHeight="69.0" prefWidth="560.0" BorderPane.alignment="CENTER">
          <children>
-            <Label text="Пользователь">
-               <font>
-                  <Font size="16.0" />
-               </font>
-            </Label>
+            <BorderPane prefHeight="30.0" prefWidth="560.0">
+               <left>
+                  <Label text="Пользователь" BorderPane.alignment="CENTER">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </Label>
+               </left>
+               <right>
+                  <Button alignment="CENTER" mnemonicParsing="false" text="&lt;-" textAlignment="RIGHT" BorderPane.alignment="CENTER" />
+               </right>
+            </BorderPane>
             <Label text="Фамилия Имя">
                <font>
                   <Font size="22.0" />

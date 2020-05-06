@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+
+<BorderPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="515.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
+   <center>
+      <ScrollPane BorderPane.alignment="CENTER">
+         <content>
+            <TableView prefHeight="400.0" prefWidth="599.0">
+              <columns>
+                <TableColumn prefWidth="75.0" text="C1" />
+                <TableColumn prefWidth="75.0" text="C2" />
+              </columns>
+            </TableView>
+         </content>
+      </ScrollPane>
+   </center>
+   <bottom>
+      <HBox alignment="CENTER" prefHeight="57.0" prefWidth="600.0" BorderPane.alignment="CENTER">
+         <children>
+            <Button mnemonicParsing="false" text="Получить файлы" />
+         </children>
+      </HBox>
+   </bottom>
+   <top>
+      <VBox alignment="CENTER" prefHeight="94.0" prefWidth="600.0" BorderPane.alignment="CENTER">
+         <children>
+            <ProgressBar prefWidth="200.0" progress="0.0" />
+            <Label text="Готово!" />
+            <Label text="Найдено профилей: " />
+            <Label text="Результаты сохранены" />
+         </children>
+      </VBox>
+   </top>
+</BorderPane>

@@ -19,10 +19,91 @@
 
 .button {
     -fx-font-size: 16;
-    -fx-background-color: white;
-    -fx-border-color: gray;
 }
 
-.button:hover {
+
+.topBar {
+    -fx-background-color: #809AEB;
+}
+
+.topBarLabel {
+    -fx-text-fill: white;
+}
+
+.menuButton {
+    -fx-pref-width: 200;
+    -fx-pref-height: 60;
+    -fx-background-color: #CFE8FA;
+    -fx-border-radius: 20;
+    -fx-background-radius: 20;
+}
+
+.menuButton:hover {
+    -fx-background-color: #7F92D0;
+    -fx-text-fill: white;
+}
+
+.backButton {
+    -fx-background-image: url("back.png");
+    -fx-background-position: center;
+    -fx-pref-width: 42;
+    -fx-background-color: #98A8DA;
+    -fx-pref-height: 42;
+    -fx-background-radius: 30;
+    -fx-border-radius: 30;
+    -fx-background-repeat: no-repeat;
+}
+
+.backButton:hover {
+    -fx-border-color: white;
+}
+
+.check-box {
+    -fx-font-size: 16;
+    -fx-start-margin: 20,0,0,0;
+}
+
+.check-box .box {
+    -fx-background-color: white;
+    -fx-border-color:grey;
+    -fx-border-radius: 5;
+}
+.check-box .box:hover {
     -fx-border-color: black;
+}
+
+#loadFile {
+    -fx-background-image: url("load.png");
+    -fx-background-color: white;
+    -fx-background-position: center;
+    -fx-pref-width: 26;
+    -fx-pref-height: 26;
+    -fx-min-width: 26;
+    -fx-min-height: 26;
+    -fx-background-repeat: no-repeat;
+}
+
+#loadFile:hover {
+    -fx-background-image: url("selected_load.png");
+}
+
+.radio-button .radio {
+    -fx-background-color: white;
+    -fx-background-image: null;
+    -fx-border-color: grey;
+    -fx-background-size: 5pt;
+}
+
+.radio-button .dot {
+    -fx-background-radius: 15px;
+    -fx-padding: 10px;
+}
+
+.FAQbutton {
+    -fx-background-color: white;
+    -fx-text-fill: #34337F;
+}
+
+.FAQbutton:hover {
+    -fx-underline: true;
 }

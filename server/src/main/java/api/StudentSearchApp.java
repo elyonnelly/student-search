@@ -1,24 +1,26 @@
 package api;
 
+import api.query.Parser;
+import api.query.Query;
+import api.search.Searcher;
 import com.sun.net.httpserver.HttpServer;
 import com.vk.api.sdk.client.TransportClient;
 import com.vk.api.sdk.client.VkApiClient;
 import com.vk.api.sdk.client.actors.GroupActor;
+import com.vk.api.sdk.client.actors.ServiceActor;
 import com.vk.api.sdk.client.actors.UserActor;
 import com.vk.api.sdk.exceptions.ApiException;
 import com.vk.api.sdk.exceptions.ClientException;
 import com.vk.api.sdk.httpclient.HttpTransportClient;
 import com.vk.api.sdk.queries.groups.GroupsGetFilter;
+import javafx.util.Pair;
 import org.apache.http.HttpException;
+import parser.DocParser;
 import server.*;
 
-import javax.swing.*;
 import java.io.*;
 import java.net.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
 
 
 public class StudentSearchApp {
@@ -31,16 +33,62 @@ public class StudentSearchApp {
     private GroupActor groupActor;
     private Map<Integer, String> groupAuthCodes;
     private List<Integer> groupIds;
+    private List<List<String>> parsedText;
+    //private Map<String, List<List<Integer>>> foundUsers;
+    private Map<String, Integer> citiesId;
 
     public StudentSearchApp() {
         appSettings = new VkAppSettings();
         TransportClient transportClient = HttpTransportClient.getInstance();
         vk = new VkApiClient(transportClient);
         requestListener = new HttpRequestListener();
+        try {
+            citiesId = loadCities();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        //foundUsers = new HashMap<>();
+    }
+
+    private Map<String, Integer> loadCities() throws IOException {
+        Map<String, Integer> cities = new HashMap<>();
+        try (BufferedReader  reader = new BufferedReader(new FileReader("src/main/resources/cities.txt"))) {
+            String city = reader.readLine();
+            while (city != null) {
+                var split = city.split(";");
+                cities.put(split[0].toLowerCase(), Integer.valueOf(split[1]));
+                city = reader.readLine();
+            }
+        }
+        return cities;
+    }
+
+    public Map<String, Integer> getCitiesId() {
+        return citiesId;
+    }
+
+    public VkApiClient getVK() {
+        return vk;
+    }
+
+    public UserActor getUserActor() {
+        return userActor;
+    }
+
+    public GroupActor getGroupActor() {
+        return groupActor;
+    }
+
+    public List<List<String>> getParsedText() {
+        return parsedText;
+    }
+
+    public List<Integer> getGroupIds() {
+        return groupIds;
     }
 
     /**
-     * Start app on localhost:post
+     * Стартует приложение на локальном хосту и порту
      */
     public void startApp() {
         var httpHandler = new HttpSimpleHandler();
@@ -54,10 +102,6 @@ public class StudentSearchApp {
         }
     }
 
-    public List<Integer> getGroupIds() {
-        return groupIds;
-    }
-
     /**
      * Initialize userActor with params from config.properties.
      * Set group ids where userActor is admin
@@ -66,6 +110,49 @@ public class StudentSearchApp {
     public void userAuthorization() throws InterruptedException, HttpException, IOException, ApiException, URISyntaxException, ClientException {
         userActor = Authorization.createUserActor(this);
         groupIds = vk.groups().get(userActor).filter(GroupsGetFilter.ADMIN).execute().getItems();
+    }
+
+    /**
+     * Возвращает список найденных ids
+     * @param participants
+     */
+    public List<List<Integer>> search(List<Query> participants, String listName) throws ClientException, ApiException, InterruptedException {
+        Searcher searcher = new Searcher(this);
+        var resultOfSearch = searcher.search(participants);
+        //foundUsers.put(listName, resultOfSearch);
+        return resultOfSearch;
+    }
+
+    public List<Query> handleCsvData(File file, List<String> fields) throws ClientException, ApiException, IOException {
+        var parser = new Parser(this);
+        return parser.csvParse(file, fields, true);
+    }
+
+    /**Возвращает просто текст из pdf построчно
+     * @param source
+     * @return
+     * @throws IOException
+     */
+    public List<List<String>> getTextFromPdfDoc(File source) throws IOException {
+        parsedText = DocParser.parse(source);
+        return parsedText;
+    }
+
+    /**
+     * Возвращает распарсенный построчный текст из parsedTest в виде списка Query
+     * @param fields
+     * @param ranges
+     * @return
+     * @throws ClientException
+     * @throws ApiException
+     */
+    public List<Query> handlePdfData(List<String> fields, List<List<Pair<Integer, Integer>>> ranges) throws ClientException, ApiException {
+        var parser = new Parser(this);
+        List<Query> queries = new ArrayList<>();
+        for (int page = 0; page < ranges.size(); page++) {
+            queries.addAll(parser.pdfParse(page, fields, ranges.get(page)));
+        }
+        return queries;
     }
 
     /**
@@ -111,7 +198,7 @@ public class StudentSearchApp {
      * Read users id from file fileIds
      * @return List of ids
      */
-    public List<Integer> getIds(File fileIds) throws FileNotFoundException, NumberFormatException {
+    private List<Integer> getIds(File fileIds) throws FileNotFoundException, NumberFormatException {
         var ids = new ArrayList<Integer>();
         try (Scanner sc = new Scanner(fileIds)) {
             while(sc.hasNextLine()) {
@@ -127,13 +214,13 @@ public class StudentSearchApp {
         return ids;
     }
 
-    public void sendMessage(File fileIds) throws FileNotFoundException, NumberFormatException {
-        List<Integer> ids;
-        ids = getIds(fileIds);
-        try {
-            vk.messages().send(userActor).userIds(ids).message("Hello world!").execute();
-        } catch (ApiException | ClientException e) {
-            System.out.println(e.getMessage());
+    public void addToFriend(List<Integer> usersIds) throws ClientException, ApiException {
+        int countSend = 0;
+        for(var user : usersIds) {
+            var result = vk.friends().add(userActor, user).execute();
+            if (result.getValue() == 1) {
+                countSend++;
+            }
         }
     }
 

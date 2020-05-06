@@ -66,7 +66,7 @@ class Authorization {
         uri.addParameter("client_id", app.appSettings.app_id.toString());
         uri.addParameter("display", "page");
         uri.addParameter("redirect_uri", app.appSettings.redirect_uri);
-        uri.addParameter("scope", "groups,messages");
+        uri.addParameter("scope", "groups");
         uri.addParameter("response_type", "code");
         uri.addParameter("v", "5.45");
         return uri.build();
@@ -81,7 +81,7 @@ class Authorization {
                                             .map(String::valueOf)
                                             .collect(Collectors.joining(",", "", "")));
         uri.addParameter("display", "page");
-        uri.addParameter("scope", "manage,messages");
+        uri.addParameter("scope", "manage");
         uri.addParameter("response_type", "code");
         uri.addParameter("v", "5.45");
         return uri.build();

@@ -1,18 +1,18 @@
+package controllers;
+
 import api.StudentSearchApp;
-import api.AuthSubscriber;
-import com.vk.api.sdk.exceptions.ApiException;
-import com.vk.api.sdk.exceptions.ClientException;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.stage.Stage;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
 public class MenuController extends Controller implements Initializable {
+
+    @FXML
+    protected Label userName;
 
 
     public MenuController(Stage stage, StudentSearchApp app) {
@@ -21,7 +21,7 @@ public class MenuController extends Controller implements Initializable {
 
     @FXML
     void onActionGoToResults() {
-        viewScene("overviewScene.fxml", new OverviewController(stage, app));
+        viewScene("overviewScene.fxml", new OverviewController(stage, app, ""));
     }
 
     @FXML
@@ -48,5 +48,9 @@ public class MenuController extends Controller implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         setName(app.getUserName());
+    }
+
+    private void setName(String name) {
+        userName.setText(name);
     }
 }

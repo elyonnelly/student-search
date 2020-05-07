@@ -1,3 +1,5 @@
+package controllers;
+
 import api.AuthSubscriber;
 import api.StudentSearchApp;
 import com.vk.api.sdk.exceptions.ApiException;
@@ -8,7 +10,7 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
-public class AuthController extends Controller  implements AuthSubscriber {
+public class AuthController extends Controller implements AuthSubscriber {
 
     public AuthController(Stage stage, StudentSearchApp app) {
         super(stage, app);
@@ -26,11 +28,9 @@ public class AuthController extends Controller  implements AuthSubscriber {
             app.subscribe(this);
             app.userAuthorization();
         }  catch (IOException e) {
-            var alert = new Alert(Alert.AlertType.ERROR, e.getMessage());
-            alert.showAndWait();
+            showMessage(e.getMessage());
         } catch (ApiException | ClientException e) {
-            var alert = new Alert(Alert.AlertType.ERROR, "Ошибка с подключением к ВКонтакте! Попробуйте позже.");
-            alert.showAndWait();
+            showMessage("Ошибка с подключением к ВКонтакте! Попробуйте позже.");
         }
     }
 

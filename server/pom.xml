@@ -11,6 +11,15 @@
 
     <artifactId>server</artifactId>
 
+
+    <build>
+        <resources>
+            <resource>
+                <directory>${project.basedir}/src/main/resources</directory>
+            </resource>
+        </resources>
+    </build>
+
     <dependencies>
 
         <!-- https://mvnrepository.com/artifact/com.itextpdf/itextpdf -->

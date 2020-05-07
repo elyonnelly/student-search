@@ -1,3 +1,5 @@
+package controllers;
+
 import api.StudentSearchApp;
 import api.parse.Query;
 import api.search.MessageType;
@@ -7,7 +9,7 @@ import javafx.concurrent.Task;
 import java.util.List;
 
 /**
- * класс SearchTask прослушивает происходящее в объекте Searcher, который отправляет SearchTask сообщения о ходе поисков
+ * класс controllers.SearchTask прослушивает происходящее в объекте Searcher, который отправляет controllers.SearchTask сообщения о ходе поисков
  */
 class SearchTask extends Task<List<List<Integer>>> implements SearchSubscriber {
 
@@ -15,17 +17,19 @@ class SearchTask extends Task<List<List<Integer>>> implements SearchSubscriber {
     private List<Query> queries;
     private String listTitle;
     private int process;
+    private boolean append;
 
-    SearchTask(StudentSearchApp app, List<Query> queries, String listTitle) {
+    SearchTask(StudentSearchApp app, List<Query> queries, String listTitle, boolean append) {
         this.app = app;
         this.queries = queries;
         this.listTitle = listTitle;
+        this.append = append;
     }
 
     @Override
     protected List<List<Integer>> call() throws Exception {
         app.getSearcher().subscribe(this);
-        var result = app.fictitiousSearch(queries, listTitle);
+        var result = app.fictitiousSearch(queries, listTitle, append);
         app.getSearcher().unsubscribe(this);
         return result;
     }

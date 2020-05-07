@@ -1,3 +1,5 @@
+package controllers;
+
 import api.StudentSearchApp;
 import javafx.stage.Stage;
 

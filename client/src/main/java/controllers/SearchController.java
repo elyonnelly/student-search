@@ -1,18 +1,22 @@
+package controllers;
+
 import api.StudentSearchApp;
 import api.parse.Query;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
-import javafx.scene.paint.Color;
+import javafx.scene.control.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -23,7 +27,39 @@ public class SearchController extends Controller implements Initializable {
     private List<List<Integer>> resultOfSearch;
     private Task activeTask;
 
-    SearchController(Stage stage, StudentSearchApp app) {
+    //region FXML fields
+    @FXML
+    private Label userName;
+    @FXML
+    private ChoiceBox<String> selectFields;
+
+    @FXML
+    private ListView<String> fieldList;
+
+    @FXML
+    private TextField loadFileName;
+
+    @FXML
+    private TextField listTitle;
+
+    @FXML
+    private ProgressBar progressBar;
+
+    @FXML
+    private Button stopSearch;
+
+    @FXML
+    private Button removeField;
+
+    @FXML
+    private Label progressLabel;
+
+    @FXML
+    private CheckBox append;
+
+    //endregion
+
+    public SearchController(Stage stage, StudentSearchApp app) {
         super(stage, app);
     }
 
@@ -121,7 +157,7 @@ public class SearchController extends Controller implements Initializable {
     private void openResultSearchStage() {
         Stage resultSearchStage = new Stage();
         resultSearchStage.setTitle("Результаты поиска");
-        var loader = new FXMLLoader(getClass().getResource("resultSearchScene.fxml"));
+        var loader = new FXMLLoader(getClass().getResource("../resultSearchScene.fxml"));
         loader.setController(new ResultController(resultSearchStage, app, resultOfSearch, listTitle.getText()));
         Scene scene = null;
         try {
@@ -145,11 +181,52 @@ public class SearchController extends Controller implements Initializable {
     private void startSearch(List<Query> queries) {
         blockButtons(true);
 
-        activeTask = new SearchTask(app, queries, listTitle.getText());
+        activeTask = new SearchTask(app, queries, listTitle.getText(), append.isSelected());
         progressBar.progressProperty().bind(activeTask.progressProperty());
         progressLabel.textProperty().bind(activeTask.messageProperty());
 
         new Thread(activeTask).start();
     }
 
+    //region ViewMethods
+
+    private void setName(String name) {
+        userName.setText(name);
+    }
+
+    private void initializeSelectFields() {
+        ObservableList<String> fields = FXCollections.observableArrayList("Фамилия Имя (Отчество)", "Фамилия И. (О.)", "Фамилия", "Имя",
+                "Город", "Школа", "Класс", "Статус участника", "Другое");
+        selectFields.setItems(fields);
+    }
+
+    private boolean checkNameFields(String value) {
+        var surnameFields = Arrays.asList("Фамилия Имя (Отчество)", "Фамилия И. (О.)", "Фамилия", "Имя");
+        if (surnameFields.contains(value)) {
+            for (var field : fieldList.getItems()) {
+                if (surnameFields.contains(field)
+                        && !(value.equals("Фамилия") && field.equals("Имя") ||value.equals("Имя") && field.equals("Фамилия"))) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    private void addField(String value) {
+        var items = fieldList.getItems();
+        if (!value.equals("Другое") && items.contains(value) || !checkNameFields(value)) {
+            var alarm = new Alert(Alert.AlertType.ERROR, "Вы уже добавили подобное поле");
+            alarm.show();
+        }
+        else {
+            items.add(value);
+        }
+    }
+
+    private void setLoadFileName(String value) {
+        loadFileName.setText(value);
+    }
+
+    //endregion
 }

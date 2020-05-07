@@ -45,7 +45,7 @@
 }
 
 .backButton {
-    -fx-background-image: url("back.png");
+    -fx-background-image: url("../images/back.png");
     -fx-background-position: center;
     -fx-pref-width: 42;
     -fx-background-color: #98A8DA;
@@ -74,7 +74,7 @@
 }
 
 #loadFile {
-    -fx-background-image: url("load.png");
+    -fx-background-image: url("../images/load.png");
     -fx-background-color: white;
     -fx-background-position: center;
     -fx-pref-width: 26;
@@ -85,7 +85,7 @@
 }
 
 #loadFile:hover {
-    -fx-background-image: url("selected_load.png");
+    -fx-background-image: url("../images/selected_load.png");
 }
 
 .radio-button .radio {
@@ -130,4 +130,9 @@
     -fx-border-radius: 5;
     -fx-background-radius: 5;
     -fx-text-fill: white;
+}
+
+#updateButton {
+    -fx-pref-width: 100;
+    -fx-pref-height: 30;
 }

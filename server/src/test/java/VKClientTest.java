@@ -68,7 +68,7 @@ public class VKClientTest {
     @Test
     void testSearchUsers() throws ClientException, ApiException, IOException, InterruptedException {
         var queries = testHandleCsvData();
-        var result = app.search(queries, "testList");
+        var result = app.search(queries, "testList", true);
         for (var list : result) {
             for (var user : list) {
                 System.out.println(user);

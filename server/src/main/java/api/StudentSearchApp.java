@@ -125,10 +125,12 @@ public class StudentSearchApp {
      * @param listName название списка
      * @throws IOException ошибка при сохранении файлов
      */
-    public void saveFile(List<List<Integer>> result, String listName, String path) throws IOException {
-        try (FileWriter writerWinners = new FileWriter(new File(path +"Winners"+listName+".txt"), true);
-             FileWriter writerPrizewinners = new FileWriter(new File(path +"Prizewinners"+listName+".txt"), true);
-             FileWriter writerParticipant = new FileWriter(new File(path +"Participant"+listName+".txt"), true)) {
+    public void saveFile(List<List<Integer>> result, String listName, String path, boolean append) throws IOException {
+        try (FileWriter writerWinners = new FileWriter(new File(path +"Winners"+listName+".txt"), append);
+             FileWriter writerPrizewinners = new FileWriter(new File(path +"Prizewinners"+listName+".txt"), append);
+             FileWriter writerParticipant = new FileWriter(new File(path +"Participant"+listName+".txt"), append);
+             FileWriter listTitles = new FileWriter(new File(path + "listTitles.txt"), true)) {
+            listTitles.write(listName + "\n");
             for (var id : result.get(0)) {
                 writerWinners.write(id.toString() + "\n");
             }
@@ -170,10 +172,10 @@ public class StudentSearchApp {
         }
     }
 
-    public List<List<Integer>> fictitiousSearch(List<Query> participants, String listName) throws IOException {
+    public List<List<Integer>> fictitiousSearch(List<Query> participants, String listName, boolean append) throws IOException {
         var resultOfSearch = searcher.fictitiousSearch(participants);
-        saveFile(resultOfSearch, listName, "");
-        saveFile(resultOfSearch, listName, "");
+        saveFile(resultOfSearch, listName, "src/main/resources/data/", append);
+        saveFile(resultOfSearch, listName, "src/main/resources/data/", append);
         return resultOfSearch;
     }
 
@@ -185,9 +187,9 @@ public class StudentSearchApp {
      * Если статус участника не указан, все добавляются в список участников
      * @throws IOException Ошибка записи результатов поиска в файл
      */
-    public List<List<Integer>> search(List<Query> participants, String listName) throws IOException {
+    public List<List<Integer>> search(List<Query> participants, String listName, boolean append) throws IOException {
         var resultOfSearch = searcher.search(participants);
-        saveFile(resultOfSearch, listName, "");
+        saveFile(resultOfSearch, listName, "", append);
         return resultOfSearch;
     }
 
@@ -233,7 +235,7 @@ public class StudentSearchApp {
      */
     private Map<String, Integer> loadCities() throws IOException {
         Map<String, Integer> cities = new HashMap<>();
-        File file = new File("src/main/resources/cities.txt");
+        File file = new File("src/main/resources/data/cities.txt");
         var path = file.getAbsolutePath();
         try (BufferedReader  reader = new BufferedReader(new FileReader(file))) {
             String city = reader.readLine();

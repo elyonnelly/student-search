@@ -1,4 +1,7 @@
 import api.StudentSearchApp;
+import controllers.AuthController;
+import controllers.OverviewController;
+import controllers.SearchController;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -14,11 +17,11 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage){
-        var loader = new FXMLLoader(getClass().getResource("searchScene.fxml"));
+        var loader = new FXMLLoader(getClass().getResource("overviewScene.fxml"));
         primaryStage.setTitle("StudentSearch");
         try {
             //TODO здесь нужно загрузить последнее состояние.
-            loader.setController(new SearchController(primaryStage, new StudentSearchApp()));
+            loader.setController(new OverviewController(primaryStage, new StudentSearchApp(), ""));
             var scene = new Scene(loader.load());
             scene.setFill(Color.WHITE);
             primaryStage.setScene(scene);
@@ -31,7 +34,7 @@ public class Main extends Application {
         primaryStage.setTitle("StudentSearch");
         try {
             //TODO здесь нужно загрузить последнее состояние.
-            loader.setController(new AuthController(primaryStage, new StudentSearchApp()));
+            loader.setController(new controllers.AuthController(primaryStage, new StudentSearchApp()));
             var scene = new Scene(loader.load());
             scene.setFill(Color.WHITE);
             primaryStage.setScene(scene);

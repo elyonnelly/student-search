@@ -1,8 +1,7 @@
 package api;
 
-import api.query.Parser;
-import api.query.Query;
-import api.search.SearchSubscriber;
+import api.parse.Parser;
+import api.parse.Query;
 import api.search.Searcher;
 import com.sun.net.httpserver.HttpServer;
 import com.vk.api.sdk.client.TransportClient;
@@ -24,10 +23,9 @@ public class StudentSearchApp {
     VkAppSettings appSettings;
     VkApiClient vk;
     HttpRequestListener requestListener;
-    Searcher searcher;
-    Parser parser;
 
-    private HttpServer server;
+    private Searcher searcher;
+    private Parser parser;
     private UserActor userActor;
     private List<Integer> groupIds;
     private Map<String, Integer> citiesId;
@@ -49,14 +47,6 @@ public class StudentSearchApp {
         searcher = new Searcher(this);
         parser = new Parser(this);
         parser = new Parser(this);
-    }
-
-    public synchronized void testSyncMethod() {
-        try {
-            Thread.sleep(5000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
     }
 
     public Searcher getSearcher() {
@@ -104,6 +94,7 @@ public class StudentSearchApp {
     public void startApp() throws IOException {
         var httpHandler = new HttpSimpleHandler();
         httpHandler.registerListener(requestListener);
+        HttpServer server;
         try {
             server = HttpServer.create(new InetSocketAddress("127.0.0.1", 80), 0);
         } catch (IOException e) {
@@ -124,7 +115,6 @@ public class StudentSearchApp {
         groupIds = vk.groups().get(userActor).filter(GroupsGetFilter.ADMIN).execute().getItems();
         var userInfo = vk.users().get(userActor).userIds(userActor.getId().toString()).execute();
         userName = userInfo.get(0).getFirstName() + " " + userInfo.get(0).getLastName();
-        //уведомление клиента о том, что процесс авторизации закончился
         notifyAuthSubscribers();
     }
 
@@ -135,18 +125,18 @@ public class StudentSearchApp {
      * @param listName название списка
      * @throws IOException ошибка при сохранении файлов
      */
-    public void saveFile(List<List<Integer>> result, String listName) throws IOException {
-        try (FileWriter writerWinners = new FileWriter(new File("Winners"+listName+".txt"), true);
-             FileWriter writerPrizewinners = new FileWriter(new File("Prizewinners"+listName+".txt"), true);
-             FileWriter writerParticipant = new FileWriter(new File("Participant"+listName+".txt"), true)) {
+    public void saveFile(List<List<Integer>> result, String listName, String path) throws IOException {
+        try (FileWriter writerWinners = new FileWriter(new File(path +"Winners"+listName+".txt"), true);
+             FileWriter writerPrizewinners = new FileWriter(new File(path +"Prizewinners"+listName+".txt"), true);
+             FileWriter writerParticipant = new FileWriter(new File(path +"Participant"+listName+".txt"), true)) {
             for (var id : result.get(0)) {
-                writerWinners.write(id.toString());
+                writerWinners.write(id.toString() + "\n");
             }
             for (var id : result.get(1)) {
-                writerPrizewinners.write(id.toString());
+                writerPrizewinners.write(id.toString() + "\n");
             }
             for (var id : result.get(2)) {
-                writerParticipant.write(id.toString());
+                writerParticipant.write(id.toString() + "\n");
             }
         }
     }
@@ -182,7 +172,8 @@ public class StudentSearchApp {
 
     public List<List<Integer>> fictitiousSearch(List<Query> participants, String listName) throws IOException {
         var resultOfSearch = searcher.fictitiousSearch(participants);
-        saveFile(resultOfSearch, listName);
+        saveFile(resultOfSearch, listName, "");
+        saveFile(resultOfSearch, listName, "");
         return resultOfSearch;
     }
 
@@ -196,7 +187,7 @@ public class StudentSearchApp {
      */
     public List<List<Integer>> search(List<Query> participants, String listName) throws IOException {
         var resultOfSearch = searcher.search(participants);
-        saveFile(resultOfSearch, listName);
+        saveFile(resultOfSearch, listName, "");
         return resultOfSearch;
     }
 

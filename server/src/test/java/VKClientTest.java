@@ -1,5 +1,5 @@
 import api.StudentSearchApp;
-import api.query.Query;
+import api.parse.Query;
 import com.vk.api.sdk.exceptions.ApiException;
 import com.vk.api.sdk.exceptions.ClientException;
 import javafx.util.Pair;

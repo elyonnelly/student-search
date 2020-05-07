@@ -4,7 +4,6 @@ import com.vk.api.sdk.client.actors.GroupActor;
 import com.vk.api.sdk.client.actors.UserActor;
 import com.vk.api.sdk.exceptions.ApiException;
 import com.vk.api.sdk.exceptions.ClientException;
-import com.vk.api.sdk.exceptions.OAuthException;
 import com.vk.api.sdk.objects.GroupAuthResponse;
 import com.vk.api.sdk.objects.UserAuthResponse;
 import org.apache.http.HttpException;
@@ -34,7 +33,7 @@ class Authorization {
         return new UserActor(authResponse.getUserId(), authResponse.getAccessToken());
     }
 
-    static Map<Integer, String> getAuthGroupCodes(StudentSearchApp app) throws URISyntaxException, InterruptedException, IOException, HttpException, ClientException, ApiException {
+    static Map<Integer, String> getAuthGroupCodes(StudentSearchApp app) throws URISyntaxException, IOException, ClientException, ApiException {
         GroupAuthResponse authResponse = app.vk.oauth()
                 .groupAuthorizationCodeFlow(app.appSettings.app_id, app.appSettings.client_secret,
                         app.appSettings.redirect_uri, getAuthCode(app, getGroupAuthUri(app)))
@@ -53,7 +52,6 @@ class Authorization {
             throw new IOException("Не получается открыть браузер для авторизации");
         }
 
-        //здесь нужно ожидание запроса
         try {
             while(app.requestListener.getParameters().size() == 0) {
                 Thread.sleep(2000);
@@ -69,7 +67,7 @@ class Authorization {
             return code;
         }
         else {
-            throw new IOException("Не получается авторизоваться.");
+            throw new IOException("Не удается авторизоваться.");
         }
     }
 

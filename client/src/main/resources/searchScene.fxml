@@ -58,7 +58,7 @@
                               <Insets right="10.0" />
                            </HBox.margin>
                         </TextField>
-                        <Button fx:id="loadFile" mnemonicParsing="false" onAction="#loadFile" prefHeight="26.0" prefWidth="26.0" styleClass="loadFile" />
+                        <Button fx:id="loadFile" mnemonicParsing="false" onAction="#onActionLoadFile" prefHeight="26.0" prefWidth="26.0" styleClass="loadFile" />
                      </children>
                   </HBox>
                   <Label text="Название списка">
@@ -78,7 +78,7 @@
                      <VBox.margin>
                         <Insets bottom="5.0" />
                      </VBox.margin></Label>
-                  <ChoiceBox fx:id="selectFields" onAction="#chooseField" prefWidth="150.0" />
+                  <ChoiceBox fx:id="selectFields" onAction="#onActionChooseField" prefWidth="150.0" />
                </children>
                <HBox.margin>
                   <Insets left="20.0" />
@@ -91,7 +91,7 @@
                      <VBox.margin>
                         <Insets top="10.0" />
                      </VBox.margin></ListView>
-                  <Button graphicTextGap="0.0" mnemonicParsing="false" onAction="#onActionRemoveField" prefHeight="25.0" prefWidth="23.0" styleClass="removeButton" text="-">
+                  <Button fx:id="removeField" graphicTextGap="0.0" mnemonicParsing="false" onAction="#onActionRemoveField" prefHeight="25.0" prefWidth="23.0" styleClass="removeButton" text="-">
                      <VBox.margin>
                         <Insets top="5.0" />
                      </VBox.margin>
@@ -119,7 +119,7 @@
             </HBox>
             <HBox alignment="CENTER" prefHeight="87.0" prefWidth="750.0">
                <children>
-                  <Button mnemonicParsing="false" onAction="#handleFile" prefHeight="44.0" prefWidth="155.0" styleClass="menuButton" text="обработать файл" />
+                  <Button mnemonicParsing="false" onAction="#onActionHandleFile" prefHeight="44.0" prefWidth="155.0" styleClass="menuButton" text="обработать файл" />
                   <Button fx:id="showResult" mnemonicParsing="false" onAction="#onActionShowResult" prefHeight="44.0" prefWidth="155.0" styleClass="menuButton" text="смотреть результаты">
                      <HBox.margin>
                         <Insets left="20.0" />

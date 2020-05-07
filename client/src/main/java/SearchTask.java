@@ -1,12 +1,15 @@
 import api.StudentSearchApp;
-import api.query.Query;
+import api.parse.Query;
 import api.search.MessageType;
 import api.search.SearchSubscriber;
 import javafx.concurrent.Task;
 
 import java.util.List;
 
-public class SearchTask extends Task<List<List<Integer>>> implements SearchSubscriber {
+/**
+ * класс SearchTask прослушивает происходящее в объекте Searcher, который отправляет SearchTask сообщения о ходе поисков
+ */
+class SearchTask extends Task<List<List<Integer>>> implements SearchSubscriber {
 
     private StudentSearchApp app;
     private List<Query> queries;
@@ -38,10 +41,12 @@ public class SearchTask extends Task<List<List<Integer>>> implements SearchSubsc
             }
             case READY: {
                 updateProgress(10, 10);
+                break;
             }
             case CANCEL: {
                 updateProgress(0, 10);
                 cancel();
+                break;
             }
         }
     }

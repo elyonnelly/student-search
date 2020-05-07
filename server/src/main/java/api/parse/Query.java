@@ -1,4 +1,4 @@
-package api.query;
+package api.parse;
 
 public class Query {
     private String q;
@@ -11,12 +11,7 @@ public class Query {
     private Integer grade;
     private StatusParticipant statusParticipant;
 
-    //useless fields
-    Integer birth_day;
-    Integer birth_month;
-    Integer birth_year;
-
-    public Query() {
+    Query() {
         q = "";
         age_from = 13;
         age_to = 18;

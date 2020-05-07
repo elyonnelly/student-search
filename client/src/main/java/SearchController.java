@@ -1,18 +1,17 @@
 import api.StudentSearchApp;
-import api.query.Query;
-import api.search.MessageType;
-import api.search.SearchSubscriber;
-import javafx.beans.property.ReadOnlyObjectWrapper;
+import api.parse.Query;
 import javafx.collections.FXCollections;
 import javafx.concurrent.Task;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.input.InputMethodEvent;
+import javafx.scene.Scene;
+import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -34,10 +33,7 @@ public class SearchController extends Controller implements Initializable {
     }
 
     @FXML
-    /*
-     * Обработчик для кнопки загрузки файла
-     */
-    void loadFile() {
+    void onActionLoadFile() {
         FileChooser fileChooser = new FileChooser();
         File file = fileChooser.showOpenDialog(stage);
         if (file != null) {
@@ -58,7 +54,7 @@ public class SearchController extends Controller implements Initializable {
     }
 
     @FXML
-    void chooseField() {
+    void onActionChooseField() {
         addField(selectFields.getValue());
     }
 
@@ -68,16 +64,6 @@ public class SearchController extends Controller implements Initializable {
         fieldList.getItems().removeAll(selectionItems);
     }
 
-    private void startSearch(List<Query> queries) {
-        progressBar.setDisable(false);
-        stopSearch.setDisable(false);
-        //TODO: заблокировать временно загрузку нового файла и нажатия на кнопки.
-        activeTask = new SearchTask(app, queries, listTitle.getText());
-        progressBar.progressProperty().bind(activeTask.progressProperty());
-        progressLabel.textProperty().bind(activeTask.messageProperty());
-        new Thread(activeTask).start();
-    }
-
     @FXML
     void onActionStopSearch() {
         activeTask.cancel();
@@ -85,16 +71,17 @@ public class SearchController extends Controller implements Initializable {
 
     @FXML
     void onActionShowResult() {
-        System.out.println(activeTask.getProgress());
-        System.out.println(activeTask.totalWorkProperty().getValue());
-        if (activeTask.getProgress() != activeTask.totalWorkProperty().getValue()) {
+        //TODO сбиндить свойство Disable у кнопки showResult и значение (activeTask.getProgress() != 1)
+        if (activeTask.getProgress() != 1) {
             return;
         }
-        System.out.println("okay go!");
+        blockButtons(false);
+        resultOfSearch = (List<List<Integer>>) activeTask.getValue();
+        openResultSearchStage();
     }
 
     @FXML
-    void handleFile() {
+    void onActionHandleFile() {
         startSearch(null);
         if (chooseFile == null) {
             showMessage("Файл не загружен!");
@@ -118,8 +105,6 @@ public class SearchController extends Controller implements Initializable {
                 return;
             }*/
             startSearch(queries);
-
-            showMessage("Файлы созданы!");
         }
         if (fileType.equals("pdf")) {
             showMessage("Заглуше4ка");
@@ -131,6 +116,40 @@ public class SearchController extends Controller implements Initializable {
         setName(app.getUserName());
         initializeSelectFields();
         fieldList.setItems(FXCollections.observableArrayList());
+    }
+
+    private void openResultSearchStage() {
+        Stage resultSearchStage = new Stage();
+        resultSearchStage.setTitle("Результаты поиска");
+        var loader = new FXMLLoader(getClass().getResource("resultSearchScene.fxml"));
+        loader.setController(new ResultController(resultSearchStage, app, resultOfSearch, listTitle.getText()));
+        Scene scene = null;
+        try {
+            scene = new Scene(loader.load());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        resultSearchStage.setScene(scene);
+        resultSearchStage.show();
+    }
+
+
+    private void blockButtons(boolean state) {
+        progressBar.setDisable(!state);
+        stopSearch.setDisable(!state);
+        selectFields.setDisable(state);
+        removeField.setDisable(state);
+        listTitle.setDisable(state);
+    }
+
+    private void startSearch(List<Query> queries) {
+        blockButtons(true);
+
+        activeTask = new SearchTask(app, queries, listTitle.getText());
+        progressBar.progressProperty().bind(activeTask.progressProperty());
+        progressLabel.textProperty().bind(activeTask.messageProperty());
+
+        new Thread(activeTask).start();
     }
 
 }

@@ -1,14 +1,17 @@
+import api.parse.StatusParticipant;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -38,7 +41,19 @@ public class View {
     Button stopSearch;
 
     @FXML
+    Button removeField;
+
+    @FXML
     Label progressLabel;
+
+    @FXML
+    ScrollPane scrollPaneResult;
+
+    @FXML
+    HBox wrapperTableResult;
+
+    @FXML
+    Label numberOfResult;
 
     View(Stage stage) {
         this.stage = stage;
@@ -58,6 +73,28 @@ public class View {
         userName.setText(name);
     }
 
+    void initializeShowResultScene(List<List<Integer>> resultOfSearch) {
+        //scrollPaneResult.vvalueProperty().bind(wrapperTableResult.heightProperty());
+        int number = 0;
+        for (int i = 0; i < 3; i++) {
+            if (resultOfSearch.get(i).size() != 0) {
+                number += resultOfSearch.get(i).size();
+                VBox vBox = new VBox();
+                vBox.setAlignment(Pos.CENTER);
+
+                Label handler = new Label(StatusParticipant.values()[i].getStringValue());
+                vBox.getChildren().add(handler);
+
+                ListView<Integer> listView = new ListView<>();
+                listView.setItems(FXCollections.observableList(resultOfSearch.get(i)));
+                vBox.getChildren().add(listView);
+
+                wrapperTableResult.getChildren().add(vBox);
+            }
+        }
+        numberOfResult.setText(String.valueOf(number));
+    }
+
     void initializeSelectFields() {
         ObservableList<String> fields = FXCollections.observableArrayList("Фамилия Имя (Отчество)", "Фамилия И. (О.)", "Фамилия", "Имя",
                 "Город", "Школа", "Класс", "Статус участника", "Другое");
@@ -65,7 +102,6 @@ public class View {
     }
 
     private boolean checkNameFields(String value) {
-        var items = fieldList.getItems();
         var surnameFields = Arrays.asList("Фамилия Имя (Отчество)", "Фамилия И. (О.)", "Фамилия", "Имя");
         if (surnameFields.contains(value)) {
             for (var field : fieldList.getItems()) {

@@ -1,12 +1,10 @@
-import api.ErrorMessage;
 import api.StudentSearchApp;
 import api.query.Query;
 import com.vk.api.sdk.exceptions.ApiException;
 import com.vk.api.sdk.exceptions.ClientException;
-import org.apache.http.HttpException;
+import javafx.util.Pair;
 
 import java.io.*;
-import java.net.URISyntaxException;
 import java.util.*;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -25,6 +23,41 @@ public class VKClientTest {
     }
 
     @Test
+    void testHandlePdfData() throws IOException, ClientException, ApiException {
+        app = new StudentSearchApp();
+        String testData = "src/main/resources/test0.pdf";
+        var parsedText = app.parsePdfByLine(new File(testData));
+
+        List<List<Pair<Integer, Integer>>> ranges = new ArrayList<>();
+        Scanner in = new Scanner(System.in);
+        for (var page : parsedText) {
+            for (int i = 0; i < page.size(); i++) {
+                System.out.println(i + " " + page.get(i));
+            }
+            /*System.out.println("Сколько диапазонов необходимо выбрать в данных?");
+            int numberOfRanges = in.nextInt();
+            System.out.println("Введите диапазоны");
+            ranges.add(new ArrayList<>());
+            for (int i = 0; i < numberOfRanges; i++) {
+                int s = in.nextInt();
+                int f = in.nextInt();
+                Pair<Integer, Integer> range = new Pair<>(s, f);
+                ranges.get(ranges.size() - 1).add(range);
+            }*/
+        }
+
+        String stringFields = "Номер ФИО Город Класс 1тур 2тур Апелляция Результат СтатусУчастника";
+        List<String> fields = Arrays.asList(stringFields.split(" "));
+
+        List<Query> handleResult = app.handlePdfData(parsedText, fields, ranges);
+
+        for (var q : handleResult) {
+            System.out.println(q);
+        }
+
+    }
+
+    @Test
     List<Query> testHandleCsvData() throws ClientException, ApiException, IOException {
         String stringFields = "Адрес электронной почты\tСсылка на страницу ВК\tФамилия\tИмя\tОтчество\tДата рождения\tКод субъекта РФ\tГород\tШкола\tКласс";
         List<String> fields = Arrays.asList(stringFields.split("\t"));
@@ -33,7 +66,7 @@ public class VKClientTest {
     }
 
     @Test
-    void testSearch() throws ClientException, ApiException, IOException, InterruptedException {
+    void testSearchUsers() throws ClientException, ApiException, IOException, InterruptedException {
         var queries = testHandleCsvData();
         var result = app.search(queries, "testList");
         for (var list : result) {
@@ -44,7 +77,7 @@ public class VKClientTest {
     }
 
     @Test
-    void testApiVK() throws ClientException, ApiException, IOException, InterruptedException {
+    void findCities() throws ClientException, ApiException, IOException, InterruptedException {
         ClassLoader classLoader = getClass().getClassLoader();
         try (BufferedReader  reader = new BufferedReader(new FileReader("src/main/resources/russianTown.txt"));
              FileWriter writer = new FileWriter("src/main/resources/russianTownId", true)) {

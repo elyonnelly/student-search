@@ -4,6 +4,7 @@ import com.vk.api.sdk.client.actors.GroupActor;
 import com.vk.api.sdk.client.actors.UserActor;
 import com.vk.api.sdk.exceptions.ApiException;
 import com.vk.api.sdk.exceptions.ClientException;
+import com.vk.api.sdk.exceptions.OAuthException;
 import com.vk.api.sdk.objects.GroupAuthResponse;
 import com.vk.api.sdk.objects.UserAuthResponse;
 import org.apache.http.HttpException;
@@ -18,11 +19,18 @@ import java.util.stream.Collectors;
 
 class Authorization {
 
-    static UserActor createUserActor(StudentSearchApp app) throws URISyntaxException, InterruptedException, IOException, HttpException, ClientException, ApiException {
-        UserAuthResponse authResponse = app.vk.oauth()
-                .userAuthorizationCodeFlow(app.appSettings.app_id, app.appSettings.client_secret,
-                        app.appSettings.redirect_uri, getAuthCode(app, getUserAuthUri(app)))
-                .execute();
+    static UserActor createUserActor(StudentSearchApp app) throws IOException, ClientException, ApiException {
+        UserAuthResponse authResponse = null;
+        try {
+            authResponse = app.vk.oauth()
+                    .userAuthorizationCodeFlow(app.appSettings.app_id, app.appSettings.client_secret,
+                            app.appSettings.redirect_uri, getAuthCode(app, getUserAuthUri(app)))
+                    .execute();
+        }  catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+
+        assert authResponse != null;
         return new UserActor(authResponse.getUserId(), authResponse.getAccessToken());
     }
 
@@ -38,16 +46,21 @@ class Authorization {
        return new GroupActor(groupId, authCodes.get(groupId));
     }
 
-    private static String getAuthCode(StudentSearchApp app, URI AuthorizationUri) throws IOException, InterruptedException, HttpException {
+    private static String getAuthCode(StudentSearchApp app, URI AuthorizationUri) throws IOException {
         try {
             Desktop.getDesktop().browse(AuthorizationUri);
         } catch (IOException e) {
-            throw new IOException("Unable to open browser for authorization");
+            throw new IOException("Не получается открыть браузер для авторизации");
         }
 
         //здесь нужно ожидание запроса
-        while(app.requestListener.getParameters().size() == 0) {
-            Thread.sleep(2000);
+        try {
+            while(app.requestListener.getParameters().size() == 0) {
+                Thread.sleep(2000);
+            }
+        }
+        catch (InterruptedException e) {
+            e.printStackTrace();
         }
         var parameter = app.requestListener.getParameters().get(0);
         if (parameter.getName().equals("code")) {
@@ -56,7 +69,7 @@ class Authorization {
             return code;
         }
         else {
-            throw new HttpException("code parameter not received");
+            throw new IOException("Не получается авторизоваться.");
         }
     }
 

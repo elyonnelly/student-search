@@ -7,16 +7,41 @@ import com.vk.api.sdk.exceptions.ClientException;
 import com.vk.api.sdk.objects.database.School;
 import com.vk.api.sdk.objects.users.UserFull;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Searcher {
     StudentSearchApp app;
+    private List<SearchSubscriber> searchSubscribers;
 
     public Searcher(StudentSearchApp app) {
         this.app = app;
+        searchSubscribers = new ArrayList<>();
     }
 
+    public void subscribe(SearchSubscriber s) {
+        searchSubscribers.add(s);
+    }
+
+    public void unsubscribe(SearchSubscriber s) {
+        searchSubscribers.remove(s);
+    }
+
+    public boolean isCancelled() {
+        for (var subscribers : searchSubscribers) {
+            if (subscribers.isCancelled()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void notifyAuthSubscribers(MessageType messageType) {
+        for (int i = 0; i < searchSubscribers.size(); i++) {
+            searchSubscribers.get(i).update(messageType);
+        }
+    }
 
     private List<School> findSchoolVKDB(int cityId, String value) throws ClientException, ApiException {
         var result = app.getVK().database().getSchools(app.getUserActor(), cityId).q(value).execute().getItems();
@@ -92,26 +117,69 @@ public class Searcher {
         }
     }
 
-    public List<List<Integer>> search(List<Query> usersQuery) throws ClientException, ApiException, InterruptedException {
+    /**
+     * Фиктивный поиск, для отладки. "Возвращает список найденных id"
+     * @param participants список пользователей для поиска
+     * @return resultOfSearch - список найденных id, где resultOfSearch[0] - список победителей, [2] - призеров, [3] - участников
+     * Если статус участника не указан, все добавляются в список участников
+     * @throws IOException Ошибка записи результатов поиска в файл
+     */
+    public List<List<Integer>> fictitiousSearch(List<Query> participants) {
+        //var result = loadListFile(listName);
         List<List<Integer>> result = new ArrayList<>();
         result.add(new ArrayList<>()); //winnert
         result.add(new ArrayList<>());//prizewinner
         result.add(new ArrayList<>());//participant
+        result.get(2).add(493076358);
+        result.get(2).add(528087524);
+        result.get(2).add(184094713);
+        result.get(2).add(197211347);
+        result.get(2).add(182402497);
+        for (int i = 0; i < 5; i++) {
+            if (isCancelled()) {
+                System.out.println("isCancelled");
+                return result;
+            }
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                notifyAuthSubscribers(MessageType.CANCEL);
+                //e.printStackTrace();
+            }
+            notifyAuthSubscribers(MessageType.ONE_MORE);
+        }
+        notifyAuthSubscribers(MessageType.READY);
+        return result;
+    }
+
+    public List<List<Integer>> search(List<Query> usersQuery) {
+        List<List<Integer>> ids = new ArrayList<>();
+        ids.add(new ArrayList<>()); //winnert
+        ids.add(new ArrayList<>());//prizewinner
+        ids.add(new ArrayList<>());//participant
         int count = 0;
         for(var user : usersQuery) {
-            var res = executeQuery(user);
-            for(var us : res) {
+            if (isCancelled()) {
+                return ids;
+            }
+            List<UserFull> userId;
+            try {
+                userId = executeQuery(user);
+            } catch (ClientException| ApiException e) {
+                notifyAuthSubscribers(MessageType.CANCEL);
+                return ids;
+            }
+            for(var us : userId) {
                 System.out.println(user.getQ());
                 count++;
-                result.get(user.getStatusParticipant().getValue()).add(us.getId());
+                ids.get(user.getStatusParticipant().getValue()).add(us.getId());
                 System.out.println(us.getId());
             }
-            if (count > 50) {
-                Thread.sleep(3000);
-                count = 0;
-            }
+            notifyAuthSubscribers(MessageType.ONE_MORE);
+            //TODO обойти блокировку на количество вызовов метода
         }
-        return result;
+        notifyAuthSubscribers(MessageType.READY);
+        return ids;
     }
 
 }

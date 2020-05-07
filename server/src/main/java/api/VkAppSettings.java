@@ -9,7 +9,7 @@ class VkAppSettings {
     String client_secret;
     String redirect_uri;
 
-    VkAppSettings() {
+    VkAppSettings() throws IOException {
         Properties prop = new Properties();
         try
         {
@@ -17,9 +17,8 @@ class VkAppSettings {
             app_id = Integer.valueOf(prop.getProperty("app_id"));
             client_secret = prop.getProperty("client_secret");
             redirect_uri = prop.getProperty("redirect_uri");
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.out.println("Ошибка при загрузке файла конфигурации");
+        } catch (IOException e){
+            throw  new IOException("Ошибка при загрузке файла конфигурации");
         }
     }
 }

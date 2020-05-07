@@ -7,8 +7,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-
-<BorderPane id = "root" stylesheets="styles.css" prefHeight="600.0" prefWidth="750.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<BorderPane id="root" prefHeight="600.0" prefWidth="750.0" stylesheets="styles.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <center>
       <VBox alignment="CENTER">
          <children>
@@ -28,7 +27,7 @@
                   <Label text="Вы будете перенаправлены на страницу авторизации в браузере." />
                </children>
             </VBox>
-            <Button mnemonicParsing="false" prefHeight="63.0" prefWidth="209.0" text="авторизоваться" />
+            <Button fx:id="authorizationButton" mnemonicParsing="false" onAction="#onActionAuthorization" prefHeight="63.0" prefWidth="209.0" text="авторизоваться" />
          </children>
       </VBox>
    </center>

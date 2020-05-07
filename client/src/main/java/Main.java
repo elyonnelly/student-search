@@ -1,23 +1,44 @@
+import api.StudentSearchApp;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.paint.Paint;
+import javafx.scene.control.Alert;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 
 import javafx.scene.paint.Color;
+
+import java.io.IOException;
 
 
 public class Main extends Application {
 
     @Override
-    public void start(Stage primaryStage) throws Exception{
-        Parent root = FXMLLoader.load(getClass().getResource("searchScene.fxml"));
+    public void start(Stage primaryStage){
+        var loader = new FXMLLoader(getClass().getResource("searchScene.fxml"));
         primaryStage.setTitle("StudentSearch");
-        var scene = new Scene(root);
-        scene.setFill(Color.WHITE);
-        primaryStage.setScene(scene);
+        try {
+            //TODO здесь нужно загрузить последнее состояние.
+            loader.setController(new SearchController(primaryStage, new StudentSearchApp()));
+            var scene = new Scene(loader.load());
+            scene.setFill(Color.WHITE);
+            primaryStage.setScene(scene);
+        } catch (IOException e) {
+            e.printStackTrace();
+            var alert = new Alert(Alert.AlertType.ERROR, e.getMessage());
+            alert.showAndWait();
+        }
+        /*var loader = new FXMLLoader(getClass().getResource("authScene.fxml"));
+        primaryStage.setTitle("StudentSearch");
+        try {
+            //TODO здесь нужно загрузить последнее состояние.
+            loader.setController(new AuthController(primaryStage, new StudentSearchApp()));
+            var scene = new Scene(loader.load());
+            scene.setFill(Color.WHITE);
+            primaryStage.setScene(scene);
+        } catch (IOException e) {
+            var alert = new Alert(Alert.AlertType.ERROR, e.getMessage());
+            alert.showAndWait();
+        }*/
         primaryStage.setResizable(true);
         primaryStage.setMinWidth(750);
         primaryStage.setMinHeight(600);

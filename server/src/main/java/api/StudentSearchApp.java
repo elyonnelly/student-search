@@ -2,19 +2,17 @@ package api;
 
 import api.query.Parser;
 import api.query.Query;
+import api.search.SearchSubscriber;
 import api.search.Searcher;
 import com.sun.net.httpserver.HttpServer;
 import com.vk.api.sdk.client.TransportClient;
 import com.vk.api.sdk.client.VkApiClient;
-import com.vk.api.sdk.client.actors.GroupActor;
-import com.vk.api.sdk.client.actors.ServiceActor;
 import com.vk.api.sdk.client.actors.UserActor;
 import com.vk.api.sdk.exceptions.ApiException;
 import com.vk.api.sdk.exceptions.ClientException;
 import com.vk.api.sdk.httpclient.HttpTransportClient;
 import com.vk.api.sdk.queries.groups.GroupsGetFilter;
 import javafx.util.Pair;
-import org.apache.http.HttpException;
 import parser.DocParser;
 import server.*;
 
@@ -22,22 +20,21 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 
-
 public class StudentSearchApp {
     VkAppSettings appSettings;
     VkApiClient vk;
     HttpRequestListener requestListener;
+    Searcher searcher;
+    Parser parser;
 
     private HttpServer server;
     private UserActor userActor;
-    private GroupActor groupActor;
-    private Map<Integer, String> groupAuthCodes;
     private List<Integer> groupIds;
-    private List<List<String>> parsedText;
-    //private Map<String, List<List<Integer>>> foundUsers;
     private Map<String, Integer> citiesId;
+    private String userName;
+    private List<AuthSubscriber> authSubscribers;
 
-    public StudentSearchApp() {
+    public StudentSearchApp() throws IOException {
         appSettings = new VkAppSettings();
         TransportClient transportClient = HttpTransportClient.getInstance();
         vk = new VkApiClient(transportClient);
@@ -46,21 +43,24 @@ public class StudentSearchApp {
             citiesId = loadCities();
         } catch (IOException e) {
             e.printStackTrace();
+            System.out.println("Ошибка с подгрузкой ресурсов");
         }
-        //foundUsers = new HashMap<>();
+        authSubscribers = new ArrayList<>();
+        searcher = new Searcher(this);
+        parser = new Parser(this);
+        parser = new Parser(this);
     }
 
-    private Map<String, Integer> loadCities() throws IOException {
-        Map<String, Integer> cities = new HashMap<>();
-        try (BufferedReader  reader = new BufferedReader(new FileReader("src/main/resources/cities.txt"))) {
-            String city = reader.readLine();
-            while (city != null) {
-                var split = city.split(";");
-                cities.put(split[0].toLowerCase(), Integer.valueOf(split[1]));
-                city = reader.readLine();
-            }
+    public synchronized void testSyncMethod() {
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
-        return cities;
+    }
+
+    public Searcher getSearcher() {
+        return searcher;
     }
 
     public Map<String, Integer> getCitiesId() {
@@ -75,155 +75,185 @@ public class StudentSearchApp {
         return userActor;
     }
 
-    public GroupActor getGroupActor() {
-        return groupActor;
-    }
-
-    public List<List<String>> getParsedText() {
-        return parsedText;
-    }
-
     public List<Integer> getGroupIds() {
         return groupIds;
     }
 
-    /**
-     * Стартует приложение на локальном хосту и порту
-     */
-    public void startApp() {
-        var httpHandler = new HttpSimpleHandler();
-        httpHandler.registerListener(requestListener);
-        try {
-            server = HttpServer.create(new InetSocketAddress("127.0.0.1", 80), 0);
-            server.createContext("/", httpHandler);
-            server.start();
-        } catch (Exception e) {
-            e.printStackTrace();
+    public String getUserName() {
+        return userName;
+    }
+
+    public void subscribe(AuthSubscriber s) {
+        authSubscribers.add(s);
+    }
+
+    public void unsubscribe(AuthSubscriber s) {
+        authSubscribers.remove(s);
+    }
+
+    private void notifyAuthSubscribers() {
+        for (int i = 0; i < authSubscribers.size(); i++) {
+            authSubscribers.get(i).update();
         }
     }
 
     /**
-     * Initialize userActor with params from config.properties.
-     * Set group ids where userActor is admin
-     * @return ErrorMessage
+     * Запускает приложение на локальном хосту и порту
+     * @throws IOException Ошибка при запуске Http-сервера
      */
-    public void userAuthorization() throws InterruptedException, HttpException, IOException, ApiException, URISyntaxException, ClientException {
-        userActor = Authorization.createUserActor(this);
-        groupIds = vk.groups().get(userActor).filter(GroupsGetFilter.ADMIN).execute().getItems();
+    public void startApp() throws IOException {
+        var httpHandler = new HttpSimpleHandler();
+        httpHandler.registerListener(requestListener);
+        try {
+            server = HttpServer.create(new InetSocketAddress("127.0.0.1", 80), 0);
+        } catch (IOException e) {
+            throw new IOException("Не удается запустить приложение.");
+        }
+        server.createContext("/", httpHandler);
+        server.start();
     }
 
     /**
-     * Возвращает список найденных ids
-     * @param participants
+     * Инициализирует объект userActor для работы с методами API VK
+     * @throws ClientException Transport layer error
+     * @throws ApiException Business logic error
+     * @throws IOException Ошибка при открытии браузера для авторизации
      */
-    public List<List<Integer>> search(List<Query> participants, String listName) throws ClientException, ApiException, InterruptedException {
-        Searcher searcher = new Searcher(this);
-        var resultOfSearch = searcher.search(participants);
-        //foundUsers.put(listName, resultOfSearch);
+    public void userAuthorization() throws ClientException, ApiException, IOException {
+        userActor = Authorization.createUserActor(this);
+        groupIds = vk.groups().get(userActor).filter(GroupsGetFilter.ADMIN).execute().getItems();
+        var userInfo = vk.users().get(userActor).userIds(userActor.getId().toString()).execute();
+        userName = userInfo.get(0).getFirstName() + " " + userInfo.get(0).getLastName();
+        //уведомление клиента о том, что процесс авторизации закончился
+        notifyAuthSubscribers();
+    }
+
+    /**
+     * Сохраняет в файлы данные о найденных пользователях,
+     * победители сохраняются в файл Winners{listName}.txt, аналогично Prizewinners и Participant.
+     * @param result список с найденными id
+     * @param listName название списка
+     * @throws IOException ошибка при сохранении файлов
+     */
+    public void saveFile(List<List<Integer>> result, String listName) throws IOException {
+        try (FileWriter writerWinners = new FileWriter(new File("Winners"+listName+".txt"), true);
+             FileWriter writerPrizewinners = new FileWriter(new File("Prizewinners"+listName+".txt"), true);
+             FileWriter writerParticipant = new FileWriter(new File("Participant"+listName+".txt"), true)) {
+            for (var id : result.get(0)) {
+                writerWinners.write(id.toString());
+            }
+            for (var id : result.get(1)) {
+                writerPrizewinners.write(id.toString());
+            }
+            for (var id : result.get(2)) {
+                writerParticipant.write(id.toString());
+            }
+        }
+    }
+
+    /**
+     * Загружает информацию о списке
+     * @param listName название списка
+     * @return список с id найденных профилей
+     * @throws IOException ошибка при работе с файлом
+     */
+    public List<List<Integer>> loadListFile(String listName) throws IOException {
+        List<List<Integer>> result = new ArrayList<>();
+        result.add(new ArrayList<>()); //winnert
+        result.add(new ArrayList<>());//prizewinner
+        result.add(new ArrayList<>());//participant
+        try (BufferedReader readerWinners = new BufferedReader(new FileReader("Winners"+listName+".txt"));
+             BufferedReader readerPrizewinners = new BufferedReader(new FileReader("Prizewinners"+listName+".txt"));
+             BufferedReader readerParticipant = new BufferedReader(new FileReader("Participant"+listName+".txt"))) {
+            readIdFile(result.get(0), readerWinners);
+            readIdFile(result.get(1), readerPrizewinners);
+            readIdFile(result.get(2), readerParticipant);
+        }
+        return result;
+    }
+
+    private void readIdFile(List<Integer> list, BufferedReader reader) throws IOException {
+        String line = reader.readLine();
+        while(line != null) {
+            list.add(Integer.valueOf(line));
+            line = reader.readLine();
+        }
+    }
+
+    public List<List<Integer>> fictitiousSearch(List<Query> participants, String listName) throws IOException {
+        var resultOfSearch = searcher.fictitiousSearch(participants);
+        saveFile(resultOfSearch, listName);
         return resultOfSearch;
     }
 
-    public List<Query> handleCsvData(File file, List<String> fields) throws ClientException, ApiException, IOException {
-        var parser = new Parser(this);
-        return parser.csvParse(file, fields, true);
-    }
-
-    /**Возвращает просто текст из pdf построчно
-     * @param source
-     * @return
-     * @throws IOException
+    /**
+     * Возвращает список найденных id
+     * @param participants список пользователей для поиска
+     * @param listName название списка
+     * @return resultOfSearch - список найденных id, где resultOfSearch[0] - список победителей, [2] - призеров, [3] - участников
+     * Если статус участника не указан, все добавляются в список участников
+     * @throws IOException Ошибка записи результатов поиска в файл
      */
-    public List<List<String>> getTextFromPdfDoc(File source) throws IOException {
-        parsedText = DocParser.parse(source);
-        return parsedText;
+    public List<List<Integer>> search(List<Query> participants, String listName) throws IOException {
+        var resultOfSearch = searcher.search(participants);
+        saveFile(resultOfSearch, listName);
+        return resultOfSearch;
     }
 
     /**
-     * Возвращает распарсенный построчный текст из parsedTest в виде списка Query
-     * @param fields
-     * @param ranges
-     * @return
-     * @throws ClientException
-     * @throws ApiException
+     * Возвращает распарсенный текст из csv-файла в виде списка Query
+     * @param file файл с данными
+     * @param fields поля в файле
+     * @return список объектов Query, распарсенных из файла
+     * @throws IOException Ошибка при чтении из файла
      */
-    public List<Query> handlePdfData(List<String> fields, List<List<Pair<Integer, Integer>>> ranges) throws ClientException, ApiException {
-        var parser = new Parser(this);
+    public List<Query> handleCsvData(File file, List<String> fields) throws IOException {
+        return parser.csvParse(file, fields, true);
+    }
+
+    /**Возвращает текст из pdf построчно
+     * @param source файл с данными
+     * @return список из содержимого страниц файла, каждая страница - список строк
+     * @throws IOException ошибка при чтении из файла
+     */
+    public List<List<String>> parsePdfByLine(File source) throws IOException {
+        return DocParser.parse(source);
+    }
+
+    /**
+     * Возвращает распарсенный построчный текст из pdf-файла в виде списка Query
+     * @param text список из содержимого страниц файла, каждая страница - список строк
+     * @param fields поля в таблице
+     * @param ranges диапазоны, в которых нужно парсить данные, для каждой страницы
+     * @return список объектов Query, распарсенных из файла
+     */
+    public List<Query> handlePdfData(List<List<String>> text, List<String> fields, List<List<Pair<Integer, Integer>>> ranges) throws IOException {
         List<Query> queries = new ArrayList<>();
         for (int page = 0; page < ranges.size(); page++) {
-            queries.addAll(parser.pdfParse(page, fields, ranges.get(page)));
+            queries.addAll(parser.pdfParse(text, page, fields, ranges.get(page)));
         }
         return queries;
     }
 
     /**
-     * Create authentication code for groups
-     * @return
+     * Подгружает в память программы список городов для последующего поиска
+     * @return таблица с указанием для каждого города его уникального id vk
+     * @throws IOException ошибка при открытии файла с данными о городах
      */
-    public void createGroupAuthCode() throws InterruptedException, HttpException, IOException, ApiException, URISyntaxException, ClientException {
-        groupAuthCodes = Authorization.getAuthGroupCodes(this);
-    }
-
-    /**
-     * Create groupActor for group with id == groupId
-     * @param groupId group id
-     * @return ErrorMessage
-     * @throws Exception if authentication code for group did not set
-     */
-    public void groupAuthorization(Integer groupId) throws Exception {
-        if (groupAuthCodes == null) {
-            createGroupAuthCode();
-        }
-        groupActor = Authorization.createGroupActor(groupId, groupAuthCodes);
-    }
-
-    /**
-     * Read users id from string stringIds
-     * @return List of ids
-     */
-    private List<Integer> getIds(String stringIds) {
-        var ids = new ArrayList<Integer>();
-        var idsArray = stringIds.split("\n");
-        for (var id : idsArray)
-        {
-            try {
-                ids.add(Integer.valueOf(id));
-            } catch (NumberFormatException ex) {
-                throw new NumberFormatException("Id is incorrect!");
+    private Map<String, Integer> loadCities() throws IOException {
+        Map<String, Integer> cities = new HashMap<>();
+        File file = new File("src/main/resources/cities.txt");
+        var path = file.getAbsolutePath();
+        try (BufferedReader  reader = new BufferedReader(new FileReader(file))) {
+            String city = reader.readLine();
+            while (city != null) {
+                var split = city.split(";");
+                cities.put(split[0].toLowerCase(), Integer.valueOf(split[1]));
+                city = reader.readLine();
             }
         }
-        return ids;
+        return cities;
     }
-
-    /**
-     * Read users id from file fileIds
-     * @return List of ids
-     */
-    private List<Integer> getIds(File fileIds) throws FileNotFoundException, NumberFormatException {
-        var ids = new ArrayList<Integer>();
-        try (Scanner sc = new Scanner(fileIds)) {
-            while(sc.hasNextLine()) {
-                ids.add(Integer.valueOf(sc.nextLine()));
-                System.out.println(ids.get(ids.size() - 1));
-            }
-        } catch (NumberFormatException ex) {
-            throw new NumberFormatException("Id is incorrect!");
-        } catch (FileNotFoundException ex) {
-            System.out.println(fileIds.getAbsolutePath());
-            throw new FileNotFoundException("File with id did not find");
-        }
-        return ids;
-    }
-
-    public void addToFriend(List<Integer> usersIds) throws ClientException, ApiException {
-        int countSend = 0;
-        for(var user : usersIds) {
-            var result = vk.friends().add(userActor, user).execute();
-            if (result.getValue() == 1) {
-                countSend++;
-            }
-        }
-    }
-
 }
 
 

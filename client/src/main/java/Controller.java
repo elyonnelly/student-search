@@ -1,13 +1,12 @@
-import javafx.fxml.FXML;
-import javafx.scene.control.Button;
+import api.StudentSearchApp;
+import javafx.stage.Stage;
 
-public class Controller {
+public class Controller extends View {
 
-    @FXML
-    Button authorization;
+    final StudentSearchApp app;
 
-    @FXML
-    void onActionAuthorization() {
-
+    Controller(Stage stage, StudentSearchApp app) {
+        super(stage);
+        this.app = app;
     }
 }

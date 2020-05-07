@@ -28,19 +28,7 @@ public class Parser {
         query.setAge_to(8 + grade);
     }
 
-
-    private List<City> findCityVKDB(String value) throws ClientException, ApiException {
-        int countryId = 1;
-        var result = app.getVK().database().getCities(app.getUserActor(), countryId).q(value).needAll(false).execute().getItems();
-        try {
-            Thread.sleep(200);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        return result;
-    }
-
-    private boolean findCity(Query q, String value) throws ClientException, ApiException {
+    private boolean findCity(Query q, String value) {
         if (app.getCitiesId().containsKey(value.toLowerCase())) {
             q.setCityId(app.getCitiesId().get(value.toLowerCase()));
             q.setCity(value);
@@ -49,7 +37,7 @@ public class Parser {
         return false;
     }
 
-    private void handleNameCeil(String value, String field, Query query) throws ClientException, ApiException {
+    private void handleNameCeil(String value, String field, Query query) {
         if (field.equals("Фамилия Имя (Отчество)")) {
             var splitted = value.split(" ");
             query.setQ(splitted[0] + " " + splitted[1]);
@@ -112,7 +100,7 @@ public class Parser {
                 }
             }
         }
-        if (field.equals("Статус участника")) {
+        if (field.equals("СтатусУчастника")) {
             //пробуем найти "победитель", "призёр". если ничего не найдено, то это "участник".
             if (value.toLowerCase().contains("победитель")) {
                 query.setStatusParticipant(StatusParticipant.WINNER);
@@ -127,7 +115,7 @@ public class Parser {
         }
     }
 
-    public List<Query> csvParse(File file, List<String> fields, boolean hasHeaders) throws IOException, ClientException, ApiException {
+    public List<Query> csvParse(File file, List<String> fields, boolean hasHeaders) throws IOException {
         List<Query> queries = new ArrayList<>();
         try (CSVParser parser = CSVParser.parse(file, Charset.defaultCharset(), CSVFormat.EXCEL.withDelimiter(';'))) {
             for (CSVRecord record : parser) {
@@ -136,35 +124,42 @@ public class Parser {
                     continue;
                 }
                 Query q = new Query();
+                if (fields.size() != record.size()) {
+                    throw new IOException("Ошибка при разборе файла. Проверьте указанные поля и состояние файла!");
+                }
                 for (int k = 0; k < fields.size(); k++) {
                     handleNameCeil(record.get(k), fields.get(k), q);
                 }
-                //System.out.println(q);
                 queries.add(q);
             }
+        }
+        catch (Exception ex) {
+            throw new IOException("Ошибка при разборе файла. Проверьте указанные поля и состояние файла!");
         }
         return queries;
     }
 
-    public List<Query> pdfParse(int pageNumber, List<String> fields, List<Pair<Integer, Integer>> ranges) throws ClientException, ApiException {
-        //итак. Лучше по страничкам таки. И лучше все же добавить возможность выбирать контент юзером самостоятельно.
-        List<String> page = app.getParsedText().get(pageNumber);
+    public List<Query> pdfParse(List<List<String>> text, int pageNumber, List<String> fields, List<Pair<Integer, Integer>> ranges) throws IOException {
         List<Query> queries = new ArrayList<>();
-        for(var range : ranges) {
-            int i = range.getKey();
-            int end = range.getValue();
-            while (i < end) {
-                Query q = new Query();
-                for (String field : fields) {
-                    if (i >= end) {
-                        break;
+        try {
+            List<String> page = text.get(pageNumber);
+            for(var range : ranges) {
+                int i = range.getKey();
+                int end = range.getValue();
+                while (i < end) {
+                    Query q = new Query();
+                    for (String field : fields) {
+                        if (i >= end) {
+                            break;
+                        }
+                        handleNameCeil(page.get(i), field, q);
+                        i++;
                     }
-                    //происходит обработка слова page.get[i] и параметра fields.get[k]
-                    handleNameCeil(page.get(i), field, q);
-                    i++;
+                    queries.add(q);
                 }
-                queries.add(q);
             }
+        } catch (Exception ex) {
+            throw new IOException("Ошибка при разборе файла. Проверьте указанные поля и состояние файла!");
         }
         return queries;
     }

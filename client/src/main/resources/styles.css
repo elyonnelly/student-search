@@ -5,6 +5,7 @@
 .label {
     -fx-font-size: 17;
     -fx-font-family: Arial;
+    -fx-wrap-text: true;
 }
 
 
@@ -30,15 +31,15 @@
     -fx-text-fill: white;
 }
 
-.menuButton {
-    -fx-pref-width: 200;
+.button {
+    -fx-pref-width: 250;
     -fx-pref-height: 60;
     -fx-background-color: #CFE8FA;
     -fx-border-radius: 20;
     -fx-background-radius: 20;
 }
 
-.menuButton:hover {
+.button:hover {
     -fx-background-color: #7F92D0;
     -fx-text-fill: white;
 }
@@ -106,4 +107,27 @@
 
 .FAQbutton:hover {
     -fx-underline: true;
+}
+
+.choice-box {
+    -fx-background-color: white;
+    -fx-border-color: grey;
+}
+
+.list-view {
+    -fx-font-size: 14;
+}
+
+
+.removeButton {
+    -fx-font-size: 12;
+    -fx-pref-width: 26;
+    -fx-pref-height: 26;
+    -fx-min-width: 26;
+    -fx-min-height: 26;
+    -fx-background-color: #abb5ff;
+    -fx-font-weight: bold;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+    -fx-text-fill: white;
 }

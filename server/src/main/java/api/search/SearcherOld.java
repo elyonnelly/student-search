@@ -10,7 +10,7 @@ import com.vk.api.sdk.objects.users.UserFull;
 
 import java.util.*;
 
-public class SearcherOld {
+class SearcherOld {
     private StudentSearchApp app;
     private List<SearchSubscriber> searchSubscribers;
 
@@ -27,9 +27,9 @@ public class SearcherOld {
         searchSubscribers.remove(s);
     }
 
-    private void notifySearchSubscribers(MessageType messageType) {
+    private void notifySearchSubscribers(MessageType messageType, int max) {
         for (int i = 0; i < searchSubscribers.size(); i++) {
-            searchSubscribers.get(i).update(messageType);
+            searchSubscribers.get(i).update(messageType, max);
         }
     }
 
@@ -70,11 +70,11 @@ public class SearcherOld {
             try {
                 Thread.sleep(0);
             } catch (InterruptedException e) {
-                notifySearchSubscribers(MessageType.CANCEL);
+                notifySearchSubscribers(MessageType.CANCEL, 10);
             }
-            notifySearchSubscribers(MessageType.ONE_MORE);
+            notifySearchSubscribers(MessageType.ONE_MORE, 10);
         }
-        notifySearchSubscribers(MessageType.READY);
+        notifySearchSubscribers(MessageType.READY, 10);
         return result;
     }
 
@@ -152,7 +152,7 @@ public class SearcherOld {
             try {
                 userId = executeQuery(user);
             } catch (ClientException| ApiException e) {
-                notifySearchSubscribers(MessageType.CANCEL);
+                notifySearchSubscribers(MessageType.CANCEL, usersQuery.size());
                 return ids;
             }
             for(var us : userId) {
@@ -161,9 +161,9 @@ public class SearcherOld {
                 ids.get(user.getStatusParticipant().getValue()).add(us.getId());
                 System.out.println(us.getId());
             }
-            notifySearchSubscribers(MessageType.ONE_MORE);
+            notifySearchSubscribers(MessageType.ONE_MORE, usersQuery.size());
         }
-        notifySearchSubscribers(MessageType.READY);
+        notifySearchSubscribers(MessageType.READY, usersQuery.size());
         return ids;
     }
 

@@ -3,6 +3,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressBar?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.BorderPane?>
@@ -139,11 +140,14 @@
                         </Label>
                      </children>
                   </HBox>
-                  <Button fx:id="updateButton" mnemonicParsing="false" onAction="#onActionUpdateButton" text="Обновить">
+                  <HBox>
                      <VBox.margin>
                         <Insets bottom="30.0" />
                      </VBox.margin>
-                  </Button>
+                     <children>
+                        <Button fx:id="updateButton" mnemonicParsing="false" onAction="#onActionUpdateButton" text="Обновить" />
+                     </children>
+                  </HBox>
                   <VBox>
                      <children>
                         <Label text="Общие подписки">
@@ -151,6 +155,15 @@
                               <Insets bottom="10.0" />
                            </VBox.margin>
                         </Label>
+                        <HBox>
+                           <children>
+                              <Label text="отобразить: " />
+                              <TextField fx:id="numberOfResult" prefHeight="25.0" prefWidth="33.0" />
+                           </children>
+                           <VBox.margin>
+                              <Insets bottom="10.0" />
+                           </VBox.margin>
+                        </HBox>
                         <ScrollPane prefHeight="36.0" prefWidth="299.0">
                            <content>
                               <HBox fx:id="commonPublic" />
@@ -159,7 +172,16 @@
                               <Insets bottom="10.0" />
                            </VBox.margin>
                         </ScrollPane>
-                        <Button fx:id="updateButton1" mnemonicParsing="false" onAction="#onActionUpdateButton" text="найти" />
+                        <HBox>
+                           <children>
+                              <Button fx:id="searchCommonPublic" mnemonicParsing="false" onAction="#onActionSearchCommonPublic" text="Найти" />
+                              <Label fx:id="searchPublicStatus">
+                                 <HBox.margin>
+                                    <Insets left="10.0" />
+                                 </HBox.margin>
+                              </Label>
+                           </children>
+                        </HBox>
                      </children>
                   </VBox>
                </children>
@@ -170,4 +192,11 @@
          </right>
       </BorderPane>
    </center>
+   <bottom>
+      <ProgressBar fx:id="progressBar" prefHeight="18.0" prefWidth="492.0" progress="0.0" visible="false" BorderPane.alignment="CENTER">
+         <BorderPane.margin>
+            <Insets bottom="30.0" />
+         </BorderPane.margin>
+      </ProgressBar>
+   </bottom>
 </BorderPane>

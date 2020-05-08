@@ -222,17 +222,12 @@ public class StudentSearchApp {
 
     /**
      * Возвращает распарсенный построчный текст из pdf-файла в виде списка Query
-     * @param text список из содержимого страниц файла, каждая страница - список строк
+     * @param lines список из содержимого страниц файла
      * @param fields поля в таблице
-     * @param ranges диапазоны, в которых нужно парсить данные, для каждой страницы
      * @return список объектов Query, распарсенных из файла
      */
-    public List<Query> handlePdfData(List<List<String>> text, List<String> fields, List<List<Pair<Integer, Integer>>> ranges) throws IOException {
-        List<Query> queries = new ArrayList<>();
-        for (int page = 0; page < ranges.size(); page++) {
-            queries.addAll(parser.pdfParse(text, page, fields, ranges.get(page)));
-        }
-        return queries;
+    public List<Query> handlePdfData(List<String> lines, List<String> fields) throws IOException {
+        return parser.pdfParse(lines, fields);
     }
 
     /**

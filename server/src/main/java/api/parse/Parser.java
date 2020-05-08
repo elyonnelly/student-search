@@ -136,24 +136,17 @@ public class Parser {
         return queries;
     }
 
-    public List<Query> pdfParse(List<List<String>> text, int pageNumber, List<String> fields, List<Pair<Integer, Integer>> ranges) throws IOException {
+    public List<Query> pdfParse(List<String> lines, List<String> fields) throws IOException {
         List<Query> queries = new ArrayList<>();
         try {
-            List<String> page = text.get(pageNumber);
-            for(var range : ranges) {
-                int i = range.getKey();
-                int end = range.getValue();
-                while (i < end) {
-                    Query q = new Query();
-                    for (String field : fields) {
-                        if (i >= end) {
-                            break;
-                        }
-                        handleNameCeil(page.get(i), field, q);
-                        i++;
-                    }
-                    queries.add(q);
+            int i = 0;
+            while (i < lines.size()) {
+                Query q = new Query();
+                for (var field : fields) {
+                    handleNameCeil(lines.get(i), field, q);
+                    i++;
                 }
+                queries.add(q);
             }
         } catch (Exception ex) {
             throw new IOException("Ошибка при разборе файла. Проверьте указанные поля и состояние файла!");

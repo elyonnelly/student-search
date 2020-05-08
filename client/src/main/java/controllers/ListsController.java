@@ -15,8 +15,6 @@ import javafx.stage.Stage;
 
 import java.io.*;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.ResourceBundle;
 
 public class ListsController extends Controller implements Initializable {
@@ -52,7 +50,7 @@ public class ListsController extends Controller implements Initializable {
         btn.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent actionEvent) {
-                ListsController.this.viewScene("overviewScene.fxml", new OverviewController(stage, app, title));
+                ListsController.this.showScene("overviewScene.fxml", new OverviewController(stage, app, title));
             }
         });
         return btn;
@@ -113,6 +111,6 @@ public class ListsController extends Controller implements Initializable {
 
     @FXML
     void onActionBack() {
-        viewScene("menuScene.fxml", new MenuController(stage, app));
+        showScene("menuScene.fxml", new MenuController(stage, app));
     }
 }

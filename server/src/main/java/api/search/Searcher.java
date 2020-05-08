@@ -4,10 +4,11 @@ import api.StudentSearchApp;
 import api.parse.Query;
 import com.vk.api.sdk.exceptions.ApiException;
 import com.vk.api.sdk.exceptions.ClientException;
+import com.vk.api.sdk.objects.database.School;
+import com.vk.api.sdk.objects.groups.GroupsArray;
+import com.vk.api.sdk.objects.users.UserFull;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Searcher {
     private StudentSearchApp app;
@@ -26,9 +27,9 @@ public class Searcher {
         searchSubscribers.remove(s);
     }
 
-    private void notifySearchSubscribers(MessageType messageType) {
+    private void notifySearchSubscribers(MessageType messageType, int max) {
         for (int i = 0; i < searchSubscribers.size(); i++) {
-            searchSubscribers.get(i).update(messageType);
+            searchSubscribers.get(i).update(messageType, max);
         }
     }
 
@@ -51,30 +52,11 @@ public class Searcher {
      * Если статус участника не указан, все добавляются в список участников
      */
     public List<List<Integer>> fictitiousSearch(List<Query> participants) {
-        //var result = loadListFile(listName);
-        List<List<Integer>> result = new ArrayList<>();
-        result.add(new ArrayList<>()); //winnert
-        result.add(new ArrayList<>());//prizewinner
-        result.add(new ArrayList<>());//participant
-        result.get(2).add(493076358);
-        result.get(2).add(528087524);
-        result.get(2).add(184094713);
-        result.get(2).add(197211347);
-        result.get(2).add(182402497);
-        for (int i = 0; i < 1; i++) {
-            if (isCancelled()) {
-                System.out.println("isCancelled");
-                return result;
-            }
-            try {
-                Thread.sleep(0);
-            } catch (InterruptedException e) {
-                notifySearchSubscribers(MessageType.CANCEL);
-            }
-            notifySearchSubscribers(MessageType.ONE_MORE);
-        }
-        notifySearchSubscribers(MessageType.READY);
-        return result;
+        Command fictiveCommand = new FictiveCommand(app);
+        var fictiveData = new ArrayList<Query>();
+        fictiveData.add(new Query());
+        fictiveData.add(new Query());
+        return (List<List<Integer>>) handleRequest(fictiveData, fictiveCommand);
     }
 
     /**
@@ -116,14 +98,14 @@ public class Searcher {
             try {
                 handler.handleRequest(item);
             } catch (ClientException | ApiException e) {
-                notifySearchSubscribers(MessageType.CANCEL);
+                notifySearchSubscribers(MessageType.CANCEL, itemsRequest.size());
                 return handler.getValue();
             }
             handler.delay();
             handler.businessLogic(item);
-            notifySearchSubscribers(MessageType.ONE_MORE);
+            notifySearchSubscribers(MessageType.ONE_MORE, itemsRequest.size());
         }
-        notifySearchSubscribers(MessageType.READY);
+        notifySearchSubscribers(MessageType.READY, itemsRequest.size());
         return handler.getValue();
     }
 

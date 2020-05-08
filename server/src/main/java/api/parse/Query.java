@@ -11,11 +11,13 @@ public class Query {
     private Integer grade;
     private StatusParticipant statusParticipant;
 
-    Query() {
+    public Query() {
         q = "";
         age_from = 13;
         age_to = 18;
         statusParticipant = StatusParticipant.PARTICIPANT;
+        city = "";
+        school = "";
     }
 
     public StatusParticipant getStatusParticipant() {
@@ -74,6 +76,10 @@ public class Query {
         return cityId;
     }
 
+    public String getCity() {
+        return city;
+    }
+
     public Integer getSchoolId() {
         return schoolId;
     }
@@ -92,5 +98,9 @@ public class Query {
             s += school + " " + schoolId.toString() + " ";
         }
         return s;
+    }
+
+    public Integer getGrade() {
+        return grade;
     }
 }

@@ -126,7 +126,7 @@
             <HBox alignment="CENTER" prefHeight="87.0" prefWidth="750.0">
                <children>
                   <Button mnemonicParsing="false" onAction="#onActionHandleFile" prefHeight="44.0" prefWidth="155.0" styleClass="menuButton" text="обработать файл" />
-                  <Button fx:id="showResult" mnemonicParsing="false" onAction="#onActionShowResult" prefHeight="44.0" prefWidth="155.0" styleClass="menuButton" text="смотреть результаты">
+                  <Button fx:id="showResult" disable="true" mnemonicParsing="false" onAction="#onActionShowSearchResult" prefHeight="44.0" prefWidth="155.0" styleClass="menuButton" text="смотреть результаты">
                      <HBox.margin>
                         <Insets left="20.0" />
                      </HBox.margin>

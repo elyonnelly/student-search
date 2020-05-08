@@ -21,28 +21,28 @@ public class MenuController extends Controller implements Initializable {
 
     @FXML
     void onActionGoToResults() {
-        viewScene("listsScene.fxml", new ListsController(stage, app));
+        showScene("listsScene.fxml", new ListsController(stage, app));
     }
 
     @FXML
     void onActionGoToSearch() {
         userName.setText("hello");
-        viewScene("searchScene.fxml", new SearchController(stage, app));
+        showScene("searchScene.fxml", new SearchController(stage, app));
     }
 
     @FXML
     void onActionGoToAboutProgram() {
-        viewScene("aboutProgramScene.fxml", new InfoController(stage, app));
+        showScene("aboutProgramScene.fxml", new InfoController(stage, app));
     }
 
     @FXML
     void onActionContacts() {
-        viewScene("contacts.fxml", new InfoController(stage, app));
+        showScene("contacts.fxml", new InfoController(stage, app));
     }
 
     @FXML
     void onActionBack() {
-        viewScene("authScene.fxml", new AuthController(stage, app));
+        showScene("authScene.fxml", new AuthController(stage, app));
     }
 
     @Override

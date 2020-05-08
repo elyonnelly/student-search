@@ -36,7 +36,7 @@ public class AuthController extends Controller implements AuthSubscriber {
 
     @Override
     public void update() {
-        viewScene("menuScene.fxml", new MenuController(stage, app));
+        showScene("menuScene.fxml", new MenuController(stage, app));
         app.unsubscribe(this);
     }
 }

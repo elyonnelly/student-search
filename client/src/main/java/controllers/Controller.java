@@ -6,10 +6,14 @@ import views.CommonView;
 
 public class Controller extends CommonView {
 
-    final StudentSearchApp app;
+    protected final StudentSearchApp app;
 
     public Controller(Stage stage, StudentSearchApp app) {
         super(stage);
         this.app = app;
+    }
+
+    public void showCurrentStage() {
+        stage.toFront();
     }
 }

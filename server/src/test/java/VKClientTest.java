@@ -49,11 +49,7 @@ public class VKClientTest {
         String stringFields = "Номер ФИО Город Класс 1тур 2тур Апелляция Результат СтатусУчастника";
         List<String> fields = Arrays.asList(stringFields.split(" "));
 
-        List<Query> handleResult = app.handlePdfData(parsedText, fields, ranges);
-
-        for (var q : handleResult) {
-            System.out.println(q);
-        }
+        //List<Query> handleResult = app.handlePdfData(parsedText, fields, ranges);
 
     }
 

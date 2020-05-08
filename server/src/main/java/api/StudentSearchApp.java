@@ -126,21 +126,31 @@ public class StudentSearchApp {
      * @throws IOException ошибка при сохранении файлов
      */
     public void saveFile(List<List<Integer>> result, String listName, String path, boolean append) throws IOException {
-        try (FileWriter writerWinners = new FileWriter(new File(path +"Winners"+listName+".txt"), append);
-             FileWriter writerPrizewinners = new FileWriter(new File(path +"Prizewinners"+listName+".txt"), append);
-             FileWriter writerParticipant = new FileWriter(new File(path +"Participant"+listName+".txt"), append);
-             FileWriter listTitles = new FileWriter(new File(path + "listTitles.txt"), true)) {
+        try( FileWriter listTitles = new FileWriter(new File(path + "listTitles.txt"), true)) {
             listTitles.write(listName + "\n");
-            for (var id : result.get(0)) {
-                writerWinners.write(id.toString() + "\n");
-            }
-            for (var id : result.get(1)) {
-                writerPrizewinners.write(id.toString() + "\n");
-            }
-            for (var id : result.get(2)) {
-                writerParticipant.write(id.toString() + "\n");
+        }
+        var fileNames = buildNames("src/main/resources/data", listName);
+        for (int i = 0; i < 3; i++) {
+            try (FileWriter writer = new FileWriter(new File(fileNames.get(i)), append)) {
+                for (var id : result.get(i)) {
+                    writer.write(id.toString() + "\n");
+                }
             }
         }
+    }
+
+    /**
+     * отдает названия файлов по заголовку
+     * @param path
+     * @param title
+     * @return
+     */
+    public static List<String> buildNames(String path, String title) {
+        List<String> fileNames = new ArrayList<>();
+        fileNames.add(path + "Winners" + title + ".txt");
+        fileNames.add(path + "Prizewinners" + title + ".txt");
+        fileNames.add(path + "Participant" + title + ".txt");
+        return fileNames;
     }
 
     /**
@@ -151,15 +161,12 @@ public class StudentSearchApp {
      */
     public List<List<Integer>> loadListFile(String listName) throws IOException {
         List<List<Integer>> result = new ArrayList<>();
-        result.add(new ArrayList<>()); //winnert
-        result.add(new ArrayList<>());//prizewinner
-        result.add(new ArrayList<>());//participant
-        try (BufferedReader readerWinners = new BufferedReader(new FileReader("Winners"+listName+".txt"));
-             BufferedReader readerPrizewinners = new BufferedReader(new FileReader("Prizewinners"+listName+".txt"));
-             BufferedReader readerParticipant = new BufferedReader(new FileReader("Participant"+listName+".txt"))) {
-            readIdFile(result.get(0), readerWinners);
-            readIdFile(result.get(1), readerPrizewinners);
-            readIdFile(result.get(2), readerParticipant);
+        var fileNames = buildNames("src/main/resources/data", listName);
+        for (int i = 0; i < 3; i++) {
+            result.add(new ArrayList<>());
+            try(BufferedReader reader = new BufferedReader(new FileReader(fileNames.get(i)))) {
+                readIdFile(result.get(i), reader);
+            }
         }
         return result;
     }
@@ -215,17 +222,12 @@ public class StudentSearchApp {
 
     /**
      * Возвращает распарсенный построчный текст из pdf-файла в виде списка Query
-     * @param text список из содержимого страниц файла, каждая страница - список строк
+     * @param lines список из содержимого страниц файла
      * @param fields поля в таблице
-     * @param ranges диапазоны, в которых нужно парсить данные, для каждой страницы
      * @return список объектов Query, распарсенных из файла
      */
-    public List<Query> handlePdfData(List<List<String>> text, List<String> fields, List<List<Pair<Integer, Integer>>> ranges) throws IOException {
-        List<Query> queries = new ArrayList<>();
-        for (int page = 0; page < ranges.size(); page++) {
-            queries.addAll(parser.pdfParse(text, page, fields, ranges.get(page)));
-        }
-        return queries;
+    public List<Query> handlePdfData(List<String> lines, List<String> fields) throws IOException {
+        return parser.pdfParse(lines, fields);
     }
 
     /**

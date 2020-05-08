@@ -136,3 +136,30 @@
     -fx-pref-width: 100;
     -fx-pref-height: 30;
 }
+
+.titleButton {
+    -fx-pref-width: 400;
+    -fx-pref-height: 30;
+    -fx-background-color: white;
+    -fx-border-color: grey;
+    -fx-border-radius: 0;
+    -fx-background-radius: 0;
+    -fx-font-size: 16;
+}
+
+.titleButton:hover {
+    -fx-underline: true;
+    -fx-background-color: white;
+    -fx-text-fill: black;
+}
+
+.editButton {
+    -fx-background-image: url("../images/edit.png");
+    -fx-background-color: white;
+    -fx-background-position: center;
+    -fx-pref-width: 26;
+    -fx-pref-height: 26;
+    -fx-min-width: 26;
+    -fx-min-height: 26;
+    -fx-background-repeat: no-repeat;
+}

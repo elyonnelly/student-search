@@ -34,7 +34,7 @@ public class ResultController extends Controller implements Initializable {
     @FXML
     private Label numberOfResult;
 
-    ResultController(Stage stage, StudentSearchApp app, List<List<Integer>> results, String listTitle) {
+    public ResultController(Stage stage, StudentSearchApp app, List<List<Integer>> results, String listTitle) {
         super(stage, app);
         this.results = results;
         this.listTitle = listTitle;

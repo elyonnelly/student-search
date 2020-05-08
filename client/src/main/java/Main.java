@@ -1,5 +1,6 @@
 import api.StudentSearchApp;
 import controllers.AuthController;
+import controllers.ListsController;
 import controllers.OverviewController;
 import controllers.SearchController;
 import javafx.application.Application;
@@ -17,20 +18,7 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage){
-        var loader = new FXMLLoader(getClass().getResource("overviewScene.fxml"));
-        primaryStage.setTitle("StudentSearch");
-        try {
-            //TODO здесь нужно загрузить последнее состояние.
-            loader.setController(new OverviewController(primaryStage, new StudentSearchApp(), ""));
-            var scene = new Scene(loader.load());
-            scene.setFill(Color.WHITE);
-            primaryStage.setScene(scene);
-        } catch (IOException e) {
-            e.printStackTrace();
-            var alert = new Alert(Alert.AlertType.ERROR, e.getMessage());
-            alert.showAndWait();
-        }
-        /*var loader = new FXMLLoader(getClass().getResource("authScene.fxml"));
+        var loader = new FXMLLoader(getClass().getResource("authScene.fxml"));
         primaryStage.setTitle("StudentSearch");
         try {
             //TODO здесь нужно загрузить последнее состояние.
@@ -41,7 +29,7 @@ public class Main extends Application {
         } catch (IOException e) {
             var alert = new Alert(Alert.AlertType.ERROR, e.getMessage());
             alert.showAndWait();
-        }*/
+        }
         primaryStage.setResizable(true);
         primaryStage.setMinWidth(750);
         primaryStage.setMinHeight(600);

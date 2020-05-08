@@ -141,22 +141,27 @@
                   </HBox>
                   <Button fx:id="updateButton" mnemonicParsing="false" onAction="#onActionUpdateButton" text="Обновить">
                      <VBox.margin>
-                        <Insets bottom="10.0" />
+                        <Insets bottom="30.0" />
                      </VBox.margin>
                   </Button>
-                  <Label text="Общие подписки">
-                     <VBox.margin>
-                        <Insets top="40.0" />
-                     </VBox.margin>
-                  </Label>
-                  <ScrollPane prefHeight="36.0" prefWidth="299.0">
-                     <VBox.margin>
-                        <Insets right="10.0" top="20.0" />
-                     </VBox.margin>
-                     <content>
-                        <HBox fx:id="commonPublic" />
-                     </content>
-                  </ScrollPane>
+                  <VBox>
+                     <children>
+                        <Label text="Общие подписки">
+                           <VBox.margin>
+                              <Insets bottom="10.0" />
+                           </VBox.margin>
+                        </Label>
+                        <ScrollPane prefHeight="36.0" prefWidth="299.0">
+                           <content>
+                              <HBox fx:id="commonPublic" />
+                           </content>
+                           <VBox.margin>
+                              <Insets bottom="10.0" />
+                           </VBox.margin>
+                        </ScrollPane>
+                        <Button fx:id="updateButton1" mnemonicParsing="false" onAction="#onActionUpdateButton" text="найти" />
+                     </children>
+                  </VBox>
                </children>
                <BorderPane.margin>
                   <Insets bottom="20.0" left="20.0" right="20.0" />

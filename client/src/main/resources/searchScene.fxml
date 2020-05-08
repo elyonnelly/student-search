@@ -68,7 +68,7 @@
                      </VBox.margin>
                   </Label>
                   <TextField fx:id="listTitle" maxWidth="200.0" minWidth="100.0" prefHeight="25.0" prefWidth="110.0" />
-                  <CheckBox mnemonicParsing="false" text="Добавить к уже существующим данным" wrapText="true">
+                  <CheckBox fx:id="append" mnemonicParsing="false" text="Добавить к уже существующим данным" wrapText="true">
                      <VBox.margin>
                         <Insets top="20.0" />
                      </VBox.margin>

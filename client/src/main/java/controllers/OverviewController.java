@@ -15,12 +15,17 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.ResourceBundle;
 
 public class OverviewController extends Controller implements Initializable {
 
     private String fileListTitle;
+    private List<Integer> userdId;
 
+    //region FXML fields
     @FXML
     private Label userName;
 
@@ -45,6 +50,13 @@ public class OverviewController extends Controller implements Initializable {
     @FXML
     private HBox commonPublic;
 
+    @FXML
+    private Label updateStatus;
+
+    @FXML
+    private Label searchPublicStatus;
+    //endregion
+
     public OverviewController(Stage stage, StudentSearchApp app, String fileListTitle) {
         super(stage, app);
         this.fileListTitle = fileListTitle;
@@ -57,6 +69,17 @@ public class OverviewController extends Controller implements Initializable {
 
     @FXML
     void onActionUpdateButton() {
+        if (targetCourse.getText().equals("")) {
+            showMessage("Не задана группа курсов! Укажите id");
+            return;
+        }
+        else {
+
+        }
+    }
+
+    @FXML
+    void onActionSearchCommonPublic() {
 
     }
 
@@ -68,16 +91,14 @@ public class OverviewController extends Controller implements Initializable {
     }
 
     private void loadListOfUser(String path, String listName) {
-        try (BufferedReader winnersReader = new BufferedReader(new FileReader(path + "Winners"+listName+".txt"));
-             BufferedReader prizerReader = new BufferedReader(new FileReader(path + "Prizewinners"+listName+".txt"));
-             BufferedReader participantReader = new BufferedReader(new FileReader(path + "Participant"+listName+".txt"))) {
-            uploadData(winnersReader, winners);
-            uploadData(prizerReader, prizers);
-            uploadData(participantReader, participants);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+        var fileNames = StudentSearchApp.buildNames(path, listName);
+        List<VBox> containers = Arrays.asList(winners, prizers, participants);
+        for (int i = 0; i < fileNames.size(); i++) {
+            try (BufferedReader reader = new BufferedReader(new FileReader(path + fileNames))) {
+                uploadData(reader, containers.get(i));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -86,6 +107,7 @@ public class OverviewController extends Controller implements Initializable {
         String id = reader.readLine();
         while(id != null) {
             listView.getItems().add(id);
+            userdId.add(Integer.valueOf(id));
             id = reader.readLine();
         }
         container.getChildren().add(listView);

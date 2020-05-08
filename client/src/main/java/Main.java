@@ -1,5 +1,6 @@
 import api.StudentSearchApp;
 import controllers.AuthController;
+import controllers.ListsController;
 import controllers.OverviewController;
 import controllers.SearchController;
 import javafx.application.Application;
@@ -17,11 +18,11 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage){
-        var loader = new FXMLLoader(getClass().getResource("overviewScene.fxml"));
+        var loader = new FXMLLoader(getClass().getResource("listsScene.fxml"));
         primaryStage.setTitle("StudentSearch");
         try {
             //TODO здесь нужно загрузить последнее состояние.
-            loader.setController(new OverviewController(primaryStage, new StudentSearchApp(), ""));
+            loader.setController(new ListsController(primaryStage, new StudentSearchApp()));
             var scene = new Scene(loader.load());
             scene.setFill(Color.WHITE);
             primaryStage.setScene(scene);

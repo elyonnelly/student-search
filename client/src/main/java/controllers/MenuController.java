@@ -21,7 +21,7 @@ public class MenuController extends Controller implements Initializable {
 
     @FXML
     void onActionGoToResults() {
-        viewScene("overviewScene.fxml", new OverviewController(stage, app, ""));
+        viewScene("listsScene.fxml", new ListsController(stage, app));
     }
 
     @FXML

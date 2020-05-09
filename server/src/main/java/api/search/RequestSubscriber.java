@@ -1,6 +1,6 @@
 package api.search;
 
-public interface SearchSubscriber {
+public interface RequestSubscriber {
     void update(MessageType type, int max);
     boolean isCancelled();
 }

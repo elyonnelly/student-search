@@ -14,12 +14,6 @@ public class AuthController extends Controller implements AuthSubscriber {
 
     public AuthController(Stage stage, StudentSearchApp app) {
         super(stage, app);
-        try {
-            app.startApp();
-        } catch (IOException e) {
-            var alert = new Alert(Alert.AlertType.ERROR, e.getMessage());
-            alert.show();
-        }
     }
 
     @FXML

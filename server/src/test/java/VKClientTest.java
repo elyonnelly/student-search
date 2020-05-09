@@ -17,7 +17,7 @@ public class VKClientTest {
     @BeforeAll
     static void startUp() throws Exception {
         app = new StudentSearchApp();
-        app.startApp();
+        //app.startApp();
         app.userAuthorization();
         //app.groupAuthorization(app.getGroupIds().get(0));
     }

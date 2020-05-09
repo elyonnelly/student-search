@@ -33,18 +33,6 @@ class Authorization {
         return new UserActor(authResponse.getUserId(), authResponse.getAccessToken());
     }
 
-    static Map<Integer, String> getAuthGroupCodes(StudentSearchApp app) throws URISyntaxException, IOException, ClientException, ApiException {
-        GroupAuthResponse authResponse = app.vk.oauth()
-                .groupAuthorizationCodeFlow(app.appSettings.app_id, app.appSettings.client_secret,
-                        app.appSettings.redirect_uri, getAuthCode(app, getGroupAuthUri(app)))
-                .execute();
-        return authResponse.getAccessTokens();
-    }
-
-    static GroupActor createGroupActor(Integer groupId, Map<Integer, String> authCodes) {
-       return new GroupActor(groupId, authCodes.get(groupId));
-    }
-
     private static String getAuthCode(StudentSearchApp app, URI AuthorizationUri) throws IOException {
         try {
             Desktop.getDesktop().browse(AuthorizationUri);
@@ -83,18 +71,4 @@ class Authorization {
         return uri.build();
     }
 
-    private static URI getGroupAuthUri(StudentSearchApp app) throws URISyntaxException {
-        String authorizationUri = "https://oauth.vk.com/authorize";
-        URIBuilder uri = new URIBuilder(authorizationUri);
-        uri.addParameter("client_id", app.appSettings.app_id.toString());
-        uri.addParameter("redirect_uri", app.appSettings.redirect_uri);
-        uri.addParameter("group_ids", app.getGroupIds().stream()
-                                            .map(String::valueOf)
-                                            .collect(Collectors.joining(",", "", "")));
-        uri.addParameter("display", "page");
-        uri.addParameter("scope", "manage");
-        uri.addParameter("response_type", "code");
-        uri.addParameter("v", "5.45");
-        return uri.build();
-    }
 }

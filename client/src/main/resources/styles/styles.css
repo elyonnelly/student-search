@@ -163,3 +163,39 @@
     -fx-min-height: 26;
     -fx-background-repeat: no-repeat;
 }
+
+#loadAnotherFile {
+    -fx-pref-width: 150;
+    -fx-pref-height: 40;
+    -fx-font-size: 14;
+    -fx-wrap-text: true;
+}
+
+#startSearch {
+    -fx-pref-width: 150;
+    -fx-pref-height: 40;
+    -fx-font-size: 14;
+    -fx-wrap-text: true;
+}
+
+.leftArrow {
+    -fx-pref-height: 30;
+    -fx-pref-width: 35;
+    -fx-font-size: 12;
+    -fx-border-radius: 0;
+    -fx-background-radius: 0;
+}
+
+.rightArrow {
+    -fx-pref-height: 30;
+    -fx-pref-width: 35;
+    -fx-font-size: 12;
+    -fx-border-radius: 0;
+    -fx-background-radius: 0;
+}
+
+.ready {
+    -fx-pref-width: 240;
+    -fx-pref-height: 25;
+    -fx-font-size: 12;
+}

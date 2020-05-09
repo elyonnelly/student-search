@@ -17,6 +17,6 @@ public class CountGroupMemberTaskCommand extends TaskCommandBase {
 
     @Override
     public Integer execute() throws Exception {
-        return app.getSearcher().getGroupMembers(userIds, groupId);
+        return app.getRequester().countGroupMembers(userIds, groupId);
     }
 }

@@ -2,16 +2,18 @@ package controllers;
 
 import api.StudentSearchApp;
 import api.parse.Query;
-import controllers.task.commands.*;
+import controllers.task.commands.FindUsersTaskCommand;
+import controllers.task.commands.ResponseTask;
 import javafx.collections.FXCollections;
 import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.ListView;
+import javafx.scene.control.SelectionMode;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import javafx.util.Pair;
 import views.SearchView;
 
 import java.io.File;
@@ -61,12 +63,14 @@ public class SearchController extends SearchView implements Initializable {
     @FXML
     void onActionChooseField() {
         addField(selectFields.getValue());
+        selectFields.getSelectionModel().clearSelection();
     }
 
     @FXML
     void onActionRemoveField() {
         var selectionItems = fieldList.getSelectionModel().getSelectedItems();
         fieldList.getItems().removeAll(selectionItems);
+        fieldList.getSelectionModel().clearSelection();
     }
 
     @FXML
@@ -105,11 +109,14 @@ public class SearchController extends SearchView implements Initializable {
         startSearch(resultOfHandling);
     }
 
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         setName(app.getUserName());
         initializeSelectFields();
+        fieldList.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         fieldList.setItems(FXCollections.observableArrayList());
+        fieldList.setEditable(true);
     }
 
     void handlePdfFile(List<String> lines) {
@@ -170,9 +177,8 @@ public class SearchController extends SearchView implements Initializable {
             showMessage("Поля не выбраны!");
             return false;
         }
-        if (listTitle == null || listTitle.getText().equals("")) {
-            showMessage("Не указано название списка!");
-            return false;
+        if (listTitle.getText().equals("")) {
+            listTitle.setText(chooseFile.getName());
         }
         return true;
     }

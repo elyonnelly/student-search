@@ -21,7 +21,6 @@ public class Main extends Application {
         var loader = new FXMLLoader(getClass().getResource("authScene.fxml"));
         primaryStage.setTitle("StudentSearch");
         try {
-            //TODO здесь нужно загрузить последнее состояние.
             loader.setController(new controllers.AuthController(primaryStage, new StudentSearchApp()));
             var scene = new Scene(loader.load());
             scene.setFill(Color.WHITE);

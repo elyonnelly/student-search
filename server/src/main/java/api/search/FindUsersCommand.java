@@ -55,15 +55,18 @@ public class FindUsersCommand extends RequestCommand implements Command<Query, L
         }
 
         var res = vkQuery.execute().getItems();
-        delay();
+        delay(0);
 
         if (res.size() > 0) {
             if (res.size() != 1) {
                 setSchoolId(q);
                 if (q.getSchoolId() != null) {
                     vkQuery.school(q.getSchoolId());
-                    res = vkQuery.execute().getItems();
-                    delay();
+                    var newRes = vkQuery.execute().getItems();
+                    delay(0);
+                    if (newRes.size() > 0) {
+                        return newRes;
+                    }
                 }
             }
             return res;
@@ -76,7 +79,7 @@ public class FindUsersCommand extends RequestCommand implements Command<Query, L
 
     private List<School> executeGetSchools(int cityId, String value) throws ClientException, ApiException {
         var result = app.getVK().database().getSchools(app.getUserActor(), cityId).q(value).execute().getItems();
-        delay();
+        delay(0);
         return result;
     }
 

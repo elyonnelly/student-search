@@ -2,12 +2,12 @@ package api.parse;
 
 public class Query {
     private String q;
+    private String city;
     private Integer cityId;
     private String school;
-    private String city;
+    private Integer schoolId;
     private Integer age_from;
     private Integer age_to;
-    private Integer schoolId;
     private Integer grade;
     private StatusParticipant statusParticipant;
 

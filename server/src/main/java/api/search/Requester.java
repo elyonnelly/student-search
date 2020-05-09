@@ -2,28 +2,28 @@ package api.search;
 
 import api.StudentSearchApp;
 import api.parse.Query;
+import com.vk.api.sdk.exceptions.ApiAccessException;
 import com.vk.api.sdk.exceptions.ApiException;
 import com.vk.api.sdk.exceptions.ClientException;
-import com.vk.api.sdk.objects.database.School;
-import com.vk.api.sdk.objects.groups.GroupsArray;
-import com.vk.api.sdk.objects.users.UserFull;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
-public class Searcher {
+public class Requester {
     private StudentSearchApp app;
-    private List<SearchSubscriber> searchSubscribers;
+    private List<RequestSubscriber> searchSubscribers;
 
-    public Searcher(StudentSearchApp app) {
+    public Requester(StudentSearchApp app) {
         this.app = app;
         searchSubscribers = new ArrayList<>();
     }
 
-    public void subscribe(SearchSubscriber s) {
+    public void subscribe(RequestSubscriber s) {
         searchSubscribers.add(s);
     }
 
-    public void unsubscribe(SearchSubscriber s) {
+    public void unsubscribe(RequestSubscriber s) {
         searchSubscribers.remove(s);
     }
 
@@ -46,25 +46,11 @@ public class Searcher {
     }
 
     /**
-     * Фиктивный поиск, для отладки. "Возвращает список найденных id"
-     * @param participants список пользователей для поиска
-     * @return resultOfSearch - список найденных id, где resultOfSearch[0] - список победителей, [2] - призеров, [3] - участников
-     * Если статус участника не указан, все добавляются в список участников
-     */
-    public List<List<Integer>> fictitiousSearch(List<Query> participants) {
-        Command fictiveCommand = new FictiveCommand(app);
-        var fictiveData = new ArrayList<Query>();
-        fictiveData.add(new Query());
-        fictiveData.add(new Query());
-        return (List<List<Integer>>) handleRequest(fictiveData, fictiveCommand);
-    }
-
-    /**
      * Возвращает количество пользователей в группе groupId среди пользователей userIds
      * @param userIds id пользователей
      * @param groupId id группы
      */
-    public int getGroupMembers(List<Integer> userIds, String groupId) {
+    public int countGroupMembers(List<Integer> userIds, String groupId) {
         Command groupMembers = new CountGroupMemberCommand(app, groupId);
         return (int) handleRequest(userIds, groupMembers);
     }
@@ -97,11 +83,15 @@ public class Searcher {
             }
             try {
                 handler.handleRequest(item);
-            } catch (ClientException | ApiException e) {
+            } catch (ApiAccessException ex){
+                continue;
+            }
+            catch (ClientException | ApiException e) {
+                e.printStackTrace();
                 notifySearchSubscribers(MessageType.CANCEL, itemsRequest.size());
                 return handler.getValue();
             }
-            handler.delay();
+            handler.delay(itemsRequest.size());
             handler.businessLogic(item);
             notifySearchSubscribers(MessageType.ONE_MORE, itemsRequest.size());
         }

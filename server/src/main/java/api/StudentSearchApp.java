@@ -2,7 +2,7 @@ package api;
 
 import api.parse.Parser;
 import api.parse.Query;
-import api.search.Searcher;
+import api.search.Requester;
 import com.sun.net.httpserver.HttpServer;
 import com.vk.api.sdk.client.TransportClient;
 import com.vk.api.sdk.client.VkApiClient;
@@ -10,24 +10,25 @@ import com.vk.api.sdk.client.actors.UserActor;
 import com.vk.api.sdk.exceptions.ApiException;
 import com.vk.api.sdk.exceptions.ClientException;
 import com.vk.api.sdk.httpclient.HttpTransportClient;
-import com.vk.api.sdk.queries.groups.GroupsGetFilter;
-import javafx.util.Pair;
 import parser.DocParser;
-import server.*;
+import server.HttpRequestListener;
+import server.HttpSimpleHandler;
 
 import java.io.*;
-import java.net.*;
-import java.util.*;
+import java.net.InetSocketAddress;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class StudentSearchApp {
     VkAppSettings appSettings;
     VkApiClient vk;
     HttpRequestListener requestListener;
 
-    private Searcher searcher;
+    private Requester requester;
     private Parser parser;
     private UserActor userActor;
-    private List<Integer> groupIds;
     private Map<String, Integer> citiesId;
     private String userName;
     private List<AuthSubscriber> authSubscribers;
@@ -44,13 +45,13 @@ public class StudentSearchApp {
             System.out.println("Ошибка с подгрузкой ресурсов");
         }
         authSubscribers = new ArrayList<>();
-        searcher = new Searcher(this);
+        requester = new Requester(this);
         parser = new Parser(this);
-        parser = new Parser(this);
+        startApp();
     }
 
-    public Searcher getSearcher() {
-        return searcher;
+    public Requester getRequester() {
+        return requester;
     }
 
     public Map<String, Integer> getCitiesId() {
@@ -63,10 +64,6 @@ public class StudentSearchApp {
 
     public UserActor getUserActor() {
         return userActor;
-    }
-
-    public List<Integer> getGroupIds() {
-        return groupIds;
     }
 
     public String getUserName() {
@@ -88,23 +85,6 @@ public class StudentSearchApp {
     }
 
     /**
-     * Запускает приложение на локальном хосту и порту
-     * @throws IOException Ошибка при запуске Http-сервера
-     */
-    public void startApp() throws IOException {
-        var httpHandler = new HttpSimpleHandler();
-        httpHandler.registerListener(requestListener);
-        HttpServer server;
-        try {
-            server = HttpServer.create(new InetSocketAddress("127.0.0.1", 80), 0);
-        } catch (IOException e) {
-            throw new IOException("Не удается запустить приложение.");
-        }
-        server.createContext("/", httpHandler);
-        server.start();
-    }
-
-    /**
      * Инициализирует объект userActor для работы с методами API VK
      * @throws ClientException Transport layer error
      * @throws ApiException Business logic error
@@ -112,7 +92,6 @@ public class StudentSearchApp {
      */
     public void userAuthorization() throws ClientException, ApiException, IOException {
         userActor = Authorization.createUserActor(this);
-        groupIds = vk.groups().get(userActor).filter(GroupsGetFilter.ADMIN).execute().getItems();
         var userInfo = vk.users().get(userActor).userIds(userActor.getId().toString()).execute();
         userName = userInfo.get(0).getFirstName() + " " + userInfo.get(0).getLastName();
         notifyAuthSubscribers();
@@ -129,7 +108,7 @@ public class StudentSearchApp {
         try( FileWriter listTitles = new FileWriter(new File(path + "listTitles.txt"), true)) {
             listTitles.write(listName + "\n");
         }
-        var fileNames = buildNames("src/main/resources/data", listName);
+        var fileNames = buildNames(path, listName);
         for (int i = 0; i < 3; i++) {
             try (FileWriter writer = new FileWriter(new File(fileNames.get(i)), append)) {
                 for (var id : result.get(i)) {
@@ -147,43 +126,10 @@ public class StudentSearchApp {
      */
     public static List<String> buildNames(String path, String title) {
         List<String> fileNames = new ArrayList<>();
-        fileNames.add(path + "Winners" + title + ".txt");
-        fileNames.add(path + "Prizewinners" + title + ".txt");
-        fileNames.add(path + "Participant" + title + ".txt");
+        fileNames.add(path + "Winners_" + title + ".txt");
+        fileNames.add(path + "Prizewinners_" + title + ".txt");
+        fileNames.add(path + "Participant_" + title + ".txt");
         return fileNames;
-    }
-
-    /**
-     * Загружает информацию о списке
-     * @param listName название списка
-     * @return список с id найденных профилей
-     * @throws IOException ошибка при работе с файлом
-     */
-    public List<List<Integer>> loadListFile(String listName) throws IOException {
-        List<List<Integer>> result = new ArrayList<>();
-        var fileNames = buildNames("src/main/resources/data", listName);
-        for (int i = 0; i < 3; i++) {
-            result.add(new ArrayList<>());
-            try(BufferedReader reader = new BufferedReader(new FileReader(fileNames.get(i)))) {
-                readIdFile(result.get(i), reader);
-            }
-        }
-        return result;
-    }
-
-    private void readIdFile(List<Integer> list, BufferedReader reader) throws IOException {
-        String line = reader.readLine();
-        while(line != null) {
-            list.add(Integer.valueOf(line));
-            line = reader.readLine();
-        }
-    }
-
-    public List<List<Integer>> fictitiousSearch(List<Query> participants, String listName, boolean append) throws IOException {
-        var resultOfSearch = searcher.fictitiousSearch(participants);
-        saveFile(resultOfSearch, listName, "src/main/resources/data/", append);
-        saveFile(resultOfSearch, listName, "src/main/resources/data/", append);
-        return resultOfSearch;
     }
 
     /**
@@ -195,8 +141,8 @@ public class StudentSearchApp {
      * @throws IOException Ошибка записи результатов поиска в файл
      */
     public List<List<Integer>> search(List<Query> participants, String listName, boolean append) throws IOException {
-        var resultOfSearch = searcher.search(participants);
-        saveFile(resultOfSearch, listName, "", append);
+        var resultOfSearch = requester.search(participants);
+        saveFile(resultOfSearch, listName, "src/main/resources/data/", append);
         return resultOfSearch;
     }
 
@@ -229,6 +175,24 @@ public class StudentSearchApp {
     public List<Query> handlePdfData(List<String> lines, List<String> fields) throws IOException {
         return parser.pdfParse(lines, fields);
     }
+
+    /**
+     * Запускает приложение на локальном хосту и порту
+     * @throws IOException Ошибка при запуске Http-сервера
+     */
+    private void startApp() throws IOException {
+        var httpHandler = new HttpSimpleHandler();
+        httpHandler.registerListener(requestListener);
+        HttpServer server;
+        try {
+            server = HttpServer.create(new InetSocketAddress("127.0.0.1", 80), 0);
+        } catch (IOException e) {
+            throw new IOException("Не удается запустить приложение.");
+        }
+        server.createContext("/", httpHandler);
+        server.start();
+    }
+
 
     /**
      * Подгружает в память программы список городов для последующего поиска

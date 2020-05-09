@@ -25,6 +25,7 @@ public class CountGroupMemberCommand extends RequestCommand implements Command<I
         count += vkResponse;
     }
 
+
     @Override
     public Integer getValue() {
         return count;

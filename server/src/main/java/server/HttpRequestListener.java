@@ -7,7 +7,10 @@ import java.util.List;
 
 public class HttpRequestListener implements Listener {
 
-    List<NameValuePair> parameters;
+    /**
+     * Параметры, полученные прослушиванием приходящих на http-сервер запросов
+     */
+    private List<NameValuePair> parameters;
 
     public HttpRequestListener() {
         parameters = new ArrayList<>();

@@ -1,11 +1,9 @@
 package parser;
 
 import com.itextpdf.text.pdf.parser.*;
-import javafx.util.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class MyTextRenderer implements TextExtractionStrategy {
     private Vector lastStart;
@@ -14,7 +12,7 @@ public class MyTextRenderer implements TextExtractionStrategy {
     private StringBuilder newWord;
     private List<String> words;
 
-    public MyTextRenderer() {
+    MyTextRenderer() {
         newWord = new StringBuilder();
         words = new ArrayList<>();
     }
@@ -26,10 +24,10 @@ public class MyTextRenderer implements TextExtractionStrategy {
     }
 
     /**
-     * Return all tokens that PDFReader found in doc
-     * @return
+     *
+     * @return Return all tokens that PDFReader found in doc
      */
-    public List<String> getWords() {
+    List<String> getWords() {
         return words;
     }
 
@@ -37,7 +35,7 @@ public class MyTextRenderer implements TextExtractionStrategy {
         return this.result.toString();
     }
 
-    protected final void appendTextChunk(CharSequence text) {
+    private void appendTextChunk(CharSequence text) {
         this.result.append(text);
     }
 

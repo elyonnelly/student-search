@@ -20,6 +20,48 @@ public class Parser {
         this.app = app;
     }
 
+    public List<Query> csvParse(File file, List<String> fields, boolean hasHeaders) throws IOException {
+        List<Query> queries = new ArrayList<>();
+        try (CSVParser parser = CSVParser.parse(file, Charset.defaultCharset(), CSVFormat.EXCEL.withDelimiter(';'))) {
+            for (CSVRecord record : parser) {
+                if (hasHeaders) {
+                    hasHeaders = false;
+                    continue;
+                }
+                Query q = new Query();
+                if (fields.size() != record.size()) {
+                    throw new IOException("Ошибка при разборе файла. Проверьте указанные поля и состояние файла!");
+                }
+                for (int k = 0; k < fields.size(); k++) {
+                    handleNameCeil(record.get(k), fields.get(k), q);
+                }
+                queries.add(q);
+            }
+        }
+        catch (Exception ex) {
+            throw new IOException("Ошибка при разборе файла. Проверьте указанные поля и состояние файла!");
+        }
+        return queries;
+    }
+
+    public List<Query> pdfParse(List<String> lines, List<String> fields) throws IOException {
+        List<Query> queries = new ArrayList<>();
+        try {
+            int i = 0;
+            while (i < lines.size()) {
+                Query q = new Query();
+                for (var field : fields) {
+                    handleNameCeil(lines.get(i), field, q);
+                    i++;
+                }
+                queries.add(q);
+            }
+        } catch (Exception ex) {
+            throw new IOException("Ошибка при разборе файла. Проверьте указанные поля и состояние файла!");
+        }
+        return queries;
+    }
+
     private void updQueryGrade(Query query, Integer grade) {
         query.setAge_from(6 + grade);
         query.setAge_to(8 + grade);
@@ -39,7 +81,7 @@ public class Parser {
             var splitted = value.split(" ");
             query.setQ(splitted[0] + " " + splitted[1]);
         }
-        if (field.equals("Фамилия И.(О.)")) {
+        if (field.equals("Фамилия И. (О.)")) {
             var splitted = value.split(" ");
             query.setQ(splitted[0]);
         }
@@ -97,7 +139,8 @@ public class Parser {
                 }
             }
         }
-        if (field.equals("СтатусУчастника")) {
+        if (field.equals("Статус Участника")) {
+            value.replace(" ", "");
             //пробуем найти "победитель", "призёр". если ничего не найдено, то это "участник".
             if (value.toLowerCase().contains("победитель")) {
                 query.setStatusParticipant(StatusParticipant.WINNER);
@@ -110,47 +153,5 @@ public class Parser {
         if (field.equals("Школа")) {
             query.setSchool(value);
         }
-    }
-
-    public List<Query> csvParse(File file, List<String> fields, boolean hasHeaders) throws IOException {
-        List<Query> queries = new ArrayList<>();
-        try (CSVParser parser = CSVParser.parse(file, Charset.defaultCharset(), CSVFormat.EXCEL.withDelimiter(';'))) {
-            for (CSVRecord record : parser) {
-                if (hasHeaders) {
-                    hasHeaders = false;
-                    continue;
-                }
-                Query q = new Query();
-                if (fields.size() != record.size()) {
-                    throw new IOException("Ошибка при разборе файла. Проверьте указанные поля и состояние файла!");
-                }
-                for (int k = 0; k < fields.size(); k++) {
-                    handleNameCeil(record.get(k), fields.get(k), q);
-                }
-                queries.add(q);
-            }
-        }
-        catch (Exception ex) {
-            throw new IOException("Ошибка при разборе файла. Проверьте указанные поля и состояние файла!");
-        }
-        return queries;
-    }
-
-    public List<Query> pdfParse(List<String> lines, List<String> fields) throws IOException {
-        List<Query> queries = new ArrayList<>();
-        try {
-            int i = 0;
-            while (i < lines.size()) {
-                Query q = new Query();
-                for (var field : fields) {
-                    handleNameCeil(lines.get(i), field, q);
-                    i++;
-                }
-                queries.add(q);
-            }
-        } catch (Exception ex) {
-            throw new IOException("Ошибка при разборе файла. Проверьте указанные поля и состояние файла!");
-        }
-        return queries;
     }
 }

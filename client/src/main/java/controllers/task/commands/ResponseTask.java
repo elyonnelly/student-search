@@ -2,11 +2,10 @@ package controllers.task.commands;
 
 import api.StudentSearchApp;
 import api.search.MessageType;
-import api.search.SearchSubscriber;
-import controllers.task.commands.TaskCommand;
+import api.search.RequestSubscriber;
 import javafx.concurrent.Task;
 
-public class ResponseTask<T> extends Task<T> implements SearchSubscriber {
+public class ResponseTask<T> extends Task<T> implements RequestSubscriber {
 
     private StudentSearchApp app;
     private double process;
@@ -40,9 +39,9 @@ public class ResponseTask<T> extends Task<T> implements SearchSubscriber {
 
     @Override
     protected T call() throws Exception {
-        app.getSearcher().subscribe(this);
+        app.getRequester().subscribe(this);
         var result = command.execute();
-        app.getSearcher().unsubscribe(this);
+        app.getRequester().unsubscribe(this);
         return result;
     }
 }

@@ -14,9 +14,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.net.URL;
 import java.util.*;
 
@@ -49,7 +47,7 @@ public class OverviewController extends Controller implements Initializable {
     private Label numberOfSubscriber;
 
     @FXML
-    private HBox commonPublic;
+    private VBox commonPublic;
 
     @FXML
     private Label searchPublicStatus;
@@ -79,7 +77,6 @@ public class OverviewController extends Controller implements Initializable {
             showMessage("Не задана группа курсов! Укажите id");
             return;
         }
-        //todo сбиндить поля, запустить таск
         activeTask = new ResponseTask(app, new CountGroupMemberTaskCommand(app, userdId, targetCourse.getText()));
         progressBar.setVisible(true);
         progressBar.progressProperty().bind(activeTask.progressProperty());
@@ -119,17 +116,12 @@ public class OverviewController extends Controller implements Initializable {
         else {
             number = Integer.parseInt(numberOfResult.getText());
         }
-        var hview = new HBox();
         var id = new ListView();
-        id.getItems().add("id паблика");
-        var count = new ListView();
-        count.getItems().add("количество");
+        id.getItems().add("id паблика   количество");
         for (var item : data) {
-            id.getItems().add(item.getKey());
-            count.getItems().add(item.getValue());
+            id.getItems().add(item.getKey() + " " + item.getValue());
         }
-        hview.getChildren().addAll(id, count);
-        commonPublic.getChildren().add(hview);
+        commonPublic.getChildren().add(id);
     }
 
 
@@ -140,6 +132,45 @@ public class OverviewController extends Controller implements Initializable {
         String path = "src/main/resources/data/";
         loadListOfUser(path, fileListTitle);
     }
+
+    private void renameList(String oldTitle, String newTitle) {
+        String path = "src/main/resources/data/";
+        //найти среди listTitles oldTitle
+        renameListTitle(path, oldTitle, newTitle);
+        //найти среди файлов файлы с названием oldTitle. сменить название.
+        var oldFileNames = StudentSearchApp.buildNames(path, oldTitle);
+        var newFileNames = StudentSearchApp.buildNames(path, newTitle);
+        for (int i = 0; i < oldFileNames.size(); i++) {
+            File file = new File(oldFileNames.get(0));
+            if (!file.renameTo(new File(newFileNames.get(0)))) {
+                showMessage("Не удается переименовать файл");
+            }
+        }
+    }
+
+    private void renameListTitle(String path, String oldTitle, String newTitle) {
+        StringBuilder titles = new StringBuilder();
+        try (BufferedReader titlesReader = new BufferedReader(new FileReader(path + "listTitles.txt"))) {
+            String title = titlesReader.readLine();
+            while(title != null) {
+                if (title.equals(oldTitle)) {
+                    titles.append(newTitle).append("\n");
+                }
+                else {
+                    titles.append(title);
+                }
+                title = titlesReader.readLine();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try (FileWriter writer = new FileWriter(path + "listTitles.txt")) {
+            writer.write(titles.toString());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     private void loadListOfUser(String path, String listName) {
         var fileNames = StudentSearchApp.buildNames(path, listName);

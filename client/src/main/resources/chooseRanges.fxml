@@ -7,8 +7,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-
-<BorderPane maxHeight="-Infinity" stylesheets="styles/styles.css" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="471.0" prefWidth="567.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<BorderPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="471.0" prefWidth="567.0" stylesheets="styles/styles.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <center>
       <VBox fx:id="lineViewComponent" BorderPane.alignment="CENTER">
          <BorderPane.margin>
@@ -28,21 +27,21 @@
          <children>
             <HBox alignment="CENTER" prefHeight="57.0" prefWidth="567.0">
                <children>
-                  <Button fx:id="goLeft" mnemonicParsing="false" onAction="#onActionGoLeft" text="&lt;-">
+                  <Button fx:id="goLeft" mnemonicParsing="false" onAction="#onActionGoLeft" styleClass="leftArrow" text="&lt;-">
                      <HBox.margin>
                         <Insets right="10.0" />
                      </HBox.margin>
                   </Button>
                   <Label fx:id="numberOfPage" text="1" />
                   <Label fx:id="totalPages" text="/10" />
-                  <Button fx:id="goRigth" mnemonicParsing="false" onAction="#onActionGoRight" text="-&gt;">
+                  <Button fx:id="goRigth" mnemonicParsing="false" onAction="#onActionGoRight" styleClass="rightArrow" text="-&gt;">
                      <HBox.margin>
                         <Insets left="10.0" />
                      </HBox.margin>
                   </Button>
                </children>
             </HBox>
-            <Button mnemonicParsing="false" onAction="#onActionRangesSelected" text="Готово. Начать обработку.">
+            <Button mnemonicParsing="false" onAction="#onActionRangesSelected" styleClass="ready" text="Готово. Начать обработку.">
                <VBox.margin>
                   <Insets bottom="20.0" />
                </VBox.margin>

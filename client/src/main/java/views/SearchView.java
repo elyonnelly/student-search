@@ -63,6 +63,9 @@ public class SearchView extends Controller {
 
     protected void showHandlingResult(List<Query> queries) {
         Stage stage = new Stage();
+        stage.setResizable(false);
+        stage.setMinHeight(this.stage.getMinHeight());
+        stage.setMinWidth(this.stage.getMinWidth());
         showStage(stage, "Результат обработки файла", "../handlingResultScene.fxml", new HandlingResultController(this, stage, app, queries));
     }
 
@@ -105,10 +108,6 @@ public class SearchView extends Controller {
         ObservableList<String> fields = FXCollections.observableArrayList("Фамилия Имя (Отчество)", "Фамилия И. (О.)", "Фамилия", "Имя",
                 "Город", "Школа", "Класс", "Статус участника", "Другое");
         selectFields.setItems(fields);
-        for (int i = 2; i <= 6; i++) {
-            addField(fields.get(i));
-        }
-        addField(fields.get(8));
     }
 
     private boolean checkNameFields(String value) {
@@ -126,6 +125,9 @@ public class SearchView extends Controller {
 
 
     protected void addField(String value) {
+        if (value == null) {
+            return;
+        }
         var items = fieldList.getItems();
         if (!value.equals("Другое") && items.contains(value) || !checkNameFields(value)) {
             showMessage("Вы уже добавили подобное поле");

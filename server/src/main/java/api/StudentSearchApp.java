@@ -201,7 +201,7 @@ public class StudentSearchApp {
      */
     private Map<String, Integer> loadCities() throws IOException {
         Map<String, Integer> cities = new HashMap<>();
-        File file = new File("src/main/resources/data/cities.txt");
+        File file = new File("data/cities.txt");
         var path = file.getAbsolutePath();
         try (BufferedReader  reader = new BufferedReader(new FileReader(file))) {
             String city = reader.readLine();

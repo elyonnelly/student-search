@@ -2,7 +2,6 @@ import api.StudentSearchApp;
 import api.parse.Query;
 import com.vk.api.sdk.exceptions.ApiException;
 import com.vk.api.sdk.exceptions.ClientException;
-import javafx.util.Pair;
 
 import java.io.*;
 import java.util.*;
@@ -20,6 +19,9 @@ public class VKClientTest {
         //app.startApp();
         app.userAuthorization();
         //app.groupAuthorization(app.getGroupIds().get(0));
+    }
+
+    private class Pair<T, R> {
     }
 
     @Test

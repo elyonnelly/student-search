@@ -10,8 +10,5 @@
         <module name="client" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="studentsearchbase" target="13" />
-    </bytecodeTargetLevel>
   </component>
 </project>

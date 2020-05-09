@@ -1,15 +1,10 @@
 import api.StudentSearchApp;
-import controllers.AuthController;
-import controllers.ListsController;
-import controllers.OverviewController;
-import controllers.SearchController;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
-import javafx.stage.Stage;
-
 import javafx.scene.paint.Color;
+import javafx.stage.Stage;
 
 import java.io.IOException;
 

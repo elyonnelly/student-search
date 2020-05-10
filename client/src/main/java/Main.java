@@ -6,17 +6,21 @@ import javafx.scene.control.Alert;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
+import java.io.File;
 import java.io.IOException;
 
 
 public class Main extends Application {
 
     @Override
-    public void start(Stage primaryStage){
-        var loader = new FXMLLoader(getClass().getResource("authScene.fxml"));
+    public void start(Stage primaryStage) throws IOException {
+        var loader = new FXMLLoader(getClass().getClassLoader().getResource("authScene.fxml"));
         primaryStage.setTitle("StudentSearch");
         try {
-            loader.setController(new controllers.AuthController(primaryStage, new StudentSearchApp()));
+            loader.setController(new controllers.AuthController(primaryStage,
+                            //new StudentSearchApp(new File("data/cities.txt"), new File("config.properties"))));
+                    new StudentSearchApp(getClass().getClassLoader().getResourceAsStream("data/cities.txt"),
+                                        getClass().getClassLoader().getResourceAsStream("config.properties"))));
             var scene = new Scene(loader.load());
             scene.setFill(Color.WHITE);
             primaryStage.setScene(scene);

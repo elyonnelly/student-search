@@ -1,7 +1,9 @@
 package api;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Properties;
 
 class VkAppSettings {
@@ -9,11 +11,11 @@ class VkAppSettings {
     String client_secret;
     String redirect_uri;
 
-    VkAppSettings() throws IOException {
+    VkAppSettings(InputStream properties) throws IOException {
         Properties prop = new Properties();
         try
         {
-            prop.load(new FileInputStream("config.properties"));
+            prop.load(properties);
             app_id = Integer.valueOf(prop.getProperty("app_id"));
             client_secret = prop.getProperty("client_secret");
             redirect_uri = prop.getProperty("redirect_uri");

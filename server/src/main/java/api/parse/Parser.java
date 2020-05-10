@@ -6,9 +6,10 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.nio.charset.Charset;
+import java.nio.charset.CharsetDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,7 +23,7 @@ public class Parser {
 
     public List<Query> csvParse(File file, List<String> fields, boolean hasHeaders) throws IOException {
         List<Query> queries = new ArrayList<>();
-        try (CSVParser parser = CSVParser.parse(file, Charset.defaultCharset(), CSVFormat.EXCEL.withDelimiter(';'))) {
+        try (CSVParser parser = CSVParser.parse(file, StandardCharsets.UTF_8, CSVFormat.RFC4180.withDelimiter(';'))) {
             for (CSVRecord record : parser) {
                 if (hasHeaders) {
                     hasHeaders = false;

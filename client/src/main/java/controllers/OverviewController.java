@@ -68,7 +68,7 @@ public class OverviewController extends Controller implements Initializable {
 
     @FXML
     void onActionBack() {
-        showScene("menuScene.fxml", new MenuController(stage, app));
+        showScene("listsScene.fxml", new ListsController(stage, app));
     }
 
     @FXML
@@ -129,17 +129,17 @@ public class OverviewController extends Controller implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         setName(app.getUserName());
         listTitle.setText(fileListTitle);
-        String path = "src/main/resources/data/";
+        String path = "data/";
         loadListOfUser(path, fileListTitle);
     }
 
     private void renameList(String oldTitle, String newTitle) {
-        String path = "src/main/resources/data/";
+        String path = "data/";
         //найти среди listTitles oldTitle
         renameListTitle(path, oldTitle, newTitle);
         //найти среди файлов файлы с названием oldTitle. сменить название.
-        var oldFileNames = StudentSearchApp.buildNames(path, oldTitle);
-        var newFileNames = StudentSearchApp.buildNames(path, newTitle);
+        var oldFileNames = StudentSearchApp.buildNames(oldTitle);
+        var newFileNames = StudentSearchApp.buildNames(newTitle);
         for (int i = 0; i < oldFileNames.size(); i++) {
             File file = new File(oldFileNames.get(0));
             if (!file.renameTo(new File(newFileNames.get(0)))) {
@@ -150,7 +150,7 @@ public class OverviewController extends Controller implements Initializable {
 
     private void renameListTitle(String path, String oldTitle, String newTitle) {
         StringBuilder titles = new StringBuilder();
-        try (BufferedReader titlesReader = new BufferedReader(new FileReader(path + "listTitles.txt"))) {
+        try (BufferedReader titlesReader = new BufferedReader(new FileReader("listTitles.txt"))) {
             String title = titlesReader.readLine();
             while(title != null) {
                 if (title.equals(oldTitle)) {
@@ -164,7 +164,7 @@ public class OverviewController extends Controller implements Initializable {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        try (FileWriter writer = new FileWriter(path + "listTitles.txt")) {
+        try (FileWriter writer = new FileWriter("listTitles.txt")) {
             writer.write(titles.toString());
         } catch (IOException e) {
             e.printStackTrace();
@@ -173,7 +173,7 @@ public class OverviewController extends Controller implements Initializable {
 
 
     private void loadListOfUser(String path, String listName) {
-        var fileNames = StudentSearchApp.buildNames(path, listName);
+        var fileNames = StudentSearchApp.buildNames(listName);
         List<VBox> containers = Arrays.asList(winners, prizers, participants);
         for (int i = 0; i < fileNames.size(); i++) {
             try (BufferedReader reader = new BufferedReader(new FileReader(fileNames.get(i)))) {

@@ -10,7 +10,6 @@ import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.ListView;
 import javafx.scene.control.SelectionMode;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -84,7 +83,7 @@ public class SearchController extends SearchView implements Initializable {
         resultOfSearch = (List<List<Integer>>) activeTask.getValue();
         Stage stage = new Stage();
         showStage(stage, "Результаты поиска",
-                    "../resultSearchScene.fxml",
+                    "resultSearchScene.fxml",
                                 new ResultController(stage, app, resultOfSearch, listTitle.getText()));
     }
 
@@ -143,7 +142,7 @@ public class SearchController extends SearchView implements Initializable {
         try {
             var fileStrings = app.parsePdfByLine(chooseFile);
             Stage stage = new Stage();
-            showStage(stage, "Содержимое файла", "../chooseRanges.fxml", new ChooseRangeController(this, stage, app, fileStrings));
+            showStage(stage, "Содержимое файла", "chooseRanges.fxml", new ChooseRangeController(this, stage, app, fileStrings));
         } catch (IOException e) {
             e.printStackTrace();
             showMessage(e.getMessage());

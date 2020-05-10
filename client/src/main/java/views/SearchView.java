@@ -66,7 +66,7 @@ public class SearchView extends Controller {
         stage.setResizable(false);
         stage.setMinHeight(this.stage.getMinHeight());
         stage.setMinWidth(this.stage.getMinWidth());
-        showStage(stage, "Результат обработки файла", "../handlingResultScene.fxml", new HandlingResultController(this, stage, app, queries));
+        showStage(stage, "Результат обработки файла", "handlingResultScene.fxml", new HandlingResultController(this, stage, app, queries));
     }
 
     protected void closeChildrenStage() {
@@ -80,7 +80,7 @@ public class SearchView extends Controller {
             childrenStage = newStage;
         }
         newStage.setTitle(title);
-        var loader = new FXMLLoader(getClass().getResource(sceneName));
+        var loader = new FXMLLoader(getClass().getClassLoader().getResource(sceneName));
         loader.setController(controller);
         Scene scene = null;
         try {

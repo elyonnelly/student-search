@@ -28,7 +28,7 @@ public class CommonView {
     }
 
     protected void showScene(String scene, Controller controller) {
-        var uri = getClass().getResource("../" + scene);
+        var uri = getClass().getClassLoader().getResource(scene);
         FXMLLoader loader = new FXMLLoader(uri);
         loader.setController(controller);
         try {

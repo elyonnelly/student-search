@@ -34,7 +34,7 @@ public class ListsController extends Controller implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         userName.setText(app.getUserName());
         //открываем файл
-        try (BufferedReader titles = new BufferedReader(new FileReader("src/main/resources/data/listTitles.txt"))) {
+        try (BufferedReader titles = new BufferedReader(new FileReader("listTitles.txt"))) {
             String title = titles.readLine();
             while(title != null) {
                 HBox titleContainer = new HBox();

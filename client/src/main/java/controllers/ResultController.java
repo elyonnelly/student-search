@@ -50,7 +50,7 @@ public class ResultController extends Controller implements Initializable {
         DirectoryChooser directoryChooser = new DirectoryChooser();
         File selectedDirectory = directoryChooser.showDialog(stage);
         try {
-            app.saveFile(results, listTitle, selectedDirectory.getPath() + "\\", false);
+            app.saveFile(results, listTitle, selectedDirectory.getPath() + "\\", false, true);
         } catch (IOException e) {
             e.printStackTrace();
             showMessage("Не удается сохранить файлы!");

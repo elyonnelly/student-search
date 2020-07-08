@@ -2,3 +2,6 @@
 Десктопное приложение.
 
 Прототип интерфейса: https://vk.cc/atG5Ve
+
+Запускаемый файл: client->target->client.bat (запускается client-jar-with-dependencies.jar)
+Необходимо в bat-файле указать путь до JavaFX SDK.

@@ -32,9 +32,7 @@ public class FindUsersCommand extends RequestCommand implements Command<Query, L
     @Override
     public void businessLogic(Query user) {
         for(var us : userId) {
-            System.out.println(user.getQ());
             ids.get(user.getStatusParticipant().getValue()).add(us.getId());
-            System.out.println(us.getId());
         }
     }
 

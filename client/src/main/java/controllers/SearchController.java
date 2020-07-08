@@ -61,7 +61,12 @@ public class SearchController extends SearchView implements Initializable {
 
     @FXML
     void onActionChooseField() {
-        addField(selectFields.getValue());
+    }
+
+    @FXML
+    void onActionAddField() {
+        addField(selectFields.getSelectionModel().getSelectedItem());
+        //addField(selectFields.getValue());
         selectFields.getSelectionModel().clearSelection();
     }
 

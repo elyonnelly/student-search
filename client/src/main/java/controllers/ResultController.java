@@ -45,7 +45,7 @@ public class ResultController extends Controller implements Initializable {
         initializeScene(results);
     }
 
-    @FXML
+    //@FXML
     void onActionDownloadFiles() {
         DirectoryChooser directoryChooser = new DirectoryChooser();
         File selectedDirectory = directoryChooser.showDialog(stage);

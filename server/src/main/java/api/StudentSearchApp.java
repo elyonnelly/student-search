@@ -10,13 +10,13 @@ import com.vk.api.sdk.client.actors.UserActor;
 import com.vk.api.sdk.exceptions.ApiException;
 import com.vk.api.sdk.exceptions.ClientException;
 import com.vk.api.sdk.httpclient.HttpTransportClient;
-import org.apache.http.impl.io.IdentityOutputStream;
 import parser.DocParser;
 import server.HttpRequestListener;
 import server.HttpSimpleHandler;
 
 import java.io.*;
 import java.net.InetSocketAddress;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -43,7 +43,6 @@ public class StudentSearchApp {
             citiesId = loadCities(null);
         } catch (IOException e) {
             e.printStackTrace();
-            System.out.println("Ошибка с подгрузкой ресурсов");
         }
         authSubscribers = new ArrayList<>();
         requester = new Requester(this);
@@ -60,7 +59,6 @@ public class StudentSearchApp {
             citiesId = loadCities(cities);
         } catch (IOException e) {
             e.printStackTrace();
-            System.out.println("Ошибка с подгрузкой ресурсов");
         }
         authSubscribers = new ArrayList<>();
         requester = new Requester(this);
@@ -123,7 +121,6 @@ public class StudentSearchApp {
      * @throws IOException ошибка при сохранении файлов
      */
     public static void saveFile(List<List<Integer>> result, String listName, String path, boolean append, boolean foRUser) throws IOException {
-        System.out.println("saving...");
         File fileTitles = new File("listTitles.txt");
         if (!foRUser) {
             try( FileWriter titles = new FileWriter(fileTitles, true)) {
@@ -142,8 +139,6 @@ public class StudentSearchApp {
 
     /**
      * отдает названия файлов по заголовку
-     * @param title
-     * @return
      */
     public static List<String> buildNames(String title) {
         List<String> fileNames = new ArrayList<>();
@@ -163,7 +158,6 @@ public class StudentSearchApp {
      */
     public List<List<Integer>> search(List<Query> participants, String listName, boolean append) throws IOException {
         var resultOfSearch = requester.search(participants);
-        System.out.println("save");
         saveFile(resultOfSearch, listName, "data/", append, false);
         return resultOfSearch;
     }
@@ -223,7 +217,7 @@ public class StudentSearchApp {
      */
     private Map<String, Integer> loadCities(InputStream file) throws IOException {
         Map<String, Integer> cities = new HashMap<>();
-        try (BufferedReader  reader = new BufferedReader(new InputStreamReader(file))) {
+        try (BufferedReader  reader = new BufferedReader(new InputStreamReader(file, StandardCharsets.UTF_8))) {
             String city = reader.readLine();
             while (city != null) {
                 var split = city.split(";");

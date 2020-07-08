@@ -1,6 +1,7 @@
 package api.parse;
 
 public class Query {
+
     private String q;
     private String city;
     private Integer cityId;
@@ -84,6 +85,9 @@ public class Query {
         return schoolId;
     }
 
+    /**
+     * @return имя пользователя, которого ищут
+     */
     public String getQ() {
         return q;
     }

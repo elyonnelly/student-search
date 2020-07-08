@@ -25,7 +25,7 @@ public class SearchView extends Controller {
     @FXML
     protected Label userName;
     @FXML
-    protected ChoiceBox<String> selectFields;
+    protected ListView<String> selectFields;
 
     @FXML
     protected ListView<String> fieldList;

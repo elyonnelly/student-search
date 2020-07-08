@@ -17,7 +17,7 @@ public interface Command<T, R> {
                 Thread.sleep(340 + rnd.nextInt(3000));
             }
             else {
-                Thread.sleep(340);
+                Thread.sleep(400);
             }
         } catch (InterruptedException e) {
             e.printStackTrace();

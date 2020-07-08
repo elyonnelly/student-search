@@ -18,7 +18,6 @@ public class ResponseTask<T> extends Task<T> implements RequestSubscriber {
 
     @Override
     public void update(MessageType messageType, int max) {
-        System.out.println(messageType);
         switch (messageType) {
             case ONE_MORE: {
                 process++;

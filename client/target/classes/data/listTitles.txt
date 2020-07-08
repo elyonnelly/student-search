@@ -5,12 +5,3 @@ test1.csv
 test1.csv
 test4.pdf
 test7.csv
-data/
-data/
-data/
-data/
-smallTest.csv
-smallTest.csv
-smallTest.csv
-smallTest.csv
-smallTest.csv
